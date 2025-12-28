@@ -53,7 +53,7 @@ class UserTableAdapters:
     #######################################
     # Insert
 
-    def insertUser(self, userName: str, eMail: str, userPassword: str, initialPassword: int=1, accessLevel: str="user", companyId: int | None = None, createUserId: int | None = None) -> bool:
+    def insertUser(self, userName: str, eMail: str, userPassword: str, initialPassword: int=1, accessLevel: str="user", companyId: int | None = None, userStatus: str | None = None, createUserId: int | None = None) -> bool:
 
         try:
 
@@ -64,9 +64,9 @@ class UserTableAdapters:
             # Insert new user info
 
             sql = f"INSERT INTO Users " \
-                f"(user_name, email, password_hash, initial_password, access_level, company_id, created_user_id, updated_user_id) " \
-                f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
-            self.cursor.execute(sql, (userName, eMail, hashedPassword, initialPassword, accessLevel, companyId, createUserId, createUserId))
+                f"(user_name, email, password_hash, initial_password, access_level, company_id, user_status, created_user_id,  updated_user_id) " \
+                f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);"
+            self.cursor.execute(sql, (userName, eMail, hashedPassword, initialPassword, accessLevel, companyId, userStatus, createUserId, createUserId))
             self.connection.commit()
             self.Logger.Info("New user info created.")
 
@@ -268,7 +268,7 @@ class SessionInfoTableAdapters:
         self.cursor.execute(sql, (update, uuid))
         self.connection.commit()
 
-        self.logger(self.logLevel.INFO, "Logout datetime updated.")
+        self.Logger.Info("Logout datetime updated.")
 
     ################################
     # Select

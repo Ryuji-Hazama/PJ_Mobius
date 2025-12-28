@@ -278,6 +278,7 @@ class UserInfo:
 
             # Check user duplication before posting
 
+            self.Logger.Info("Checking for existing user before posting new user info.")
             existingUser = self.getUserInfo(userName=userData.get("UserName"))
 
             if existingUser is not None and len(existingUser) > 0:
@@ -293,6 +294,8 @@ class UserInfo:
                 self.Logger.Warn(f"E-Mail '{userData.get('Email')}' is already registered.")
                 PJ_Mobius_Dialog.Dialog("Error", f"E-Mail '{userData.get('Email')}' is already registered. Please use a different E-Mail address.").showDialog()
                 return None
+            
+            self.Logger.Info("No existing user found. Proceeding to post new user info.")
 
             def worker():
 

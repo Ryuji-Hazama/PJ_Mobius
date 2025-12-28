@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS Users (
     company_id INT,
     login_failed INT DEFAULT 0,
     login_failed_at TIMESTAMP,
-    user_status ENUM('active', 'inactive', 'suspended') DEFAULT 'active',
+    user_status ENUM('active', 'inactive', 'suspended') DEFAULT 'inactive',
     created_user_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_user_id INT,

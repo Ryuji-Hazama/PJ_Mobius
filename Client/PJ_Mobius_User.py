@@ -281,8 +281,19 @@ class AddUserForm(ttk.Frame):
 
             if self.userAccessLevel == "super":
 
-                companyList = DataAccess.CompanyInfo().getCompanyInfo(contractLevel=5)
-                companyList.extend(DataAccess.CompanyInfo().getCompanyInfo(contractLevel=4))
+                # Get company list from database
+
+                companyList = []
+                company5List = DataAccess.CompanyInfo().getCompanyInfo(contractLevel=5)
+                company4List = DataAccess.CompanyInfo().getCompanyInfo(contractLevel=4)
+
+                if company5List is not None:
+
+                    companyList.extend(company5List)
+
+                if company4List is not None:
+
+                    companyList.extend(company4List)
 
                 # Create company dictionary
 
@@ -297,7 +308,13 @@ class AddUserForm(ttk.Frame):
                 self.combo_company = ttk.Combobox(form_f, width=28, state="disabled", textvariable=self.company)
                 companyNames = [company.get("CompanyName", "N/A") for company in companyList]
                 self.combo_company['values'] = companyNames
-                self.combo_company.current(0)
+
+                # Avoid index error if company list is empty
+
+                if len(companyNames) > 0:
+
+                    self.combo_company.current(0)
+
                 self.combo_company.grid(row=8, column=1, padx=(5, 10), pady=(5, 5))
 
             # Fix the width of the grid columns

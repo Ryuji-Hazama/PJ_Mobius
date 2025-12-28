@@ -32,17 +32,11 @@ class UserLogin:
                 suspendCount = failedCount - 2
                 suspendTime = datetime.timedelta(minutes=30 * suspendCount)
 
-                if datetime.datetime.now() < failedAt + suspendTime:
+                if datetime.datetime.now() < failedAt + suspendTime or suspendCount < 1:
 
                     if failedCount < 10:
 
                         failedCount += 1
-
-                else:
-
-                    # Reset failed count if suspend time has passed
-
-                    failedCount = 1
 
                 # Set as suspended if failed count reached 3
 
@@ -146,7 +140,17 @@ class UserLogin:
                 
                 if tablePassword != self.userPassword:
 
-                    userStatus = self.updateLoginFailed(userList[0][0], userList[0][7], userList[0][8])
+                    # Update login failed info
+
+                    if userList[0][8] is None:
+
+                        suspendDatetime = datetime.datetime.now()
+
+                    else:
+
+                        suspendDatetime = userList[0][8]
+
+                    userStatus = self.updateLoginFailed(userList[0][0], userList[0][7], suspendDatetime)
                     
                     if userStatus == "suspended":
 
@@ -530,12 +534,12 @@ class UserInfo:
             retDict["Created"] = self.userTableAdapter.insertUser(
                 userName=userName,
                 eMail=eMail,
-                password=password,
+                userPassword=password,
                 initialPassword=initialPassword,
                 accessLevel=accessLevel,
                 companyId=companyId,
                 userStatus=userStatus,
-                createdUserId=sessionUserId
+                createUserId=sessionUserId
             )
 
             if retDict["Created"]:
