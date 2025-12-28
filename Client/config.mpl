@@ -1,0 +1,16 @@
+MAPLE
+H *LOG_SETTINGS
+    CMD DEBUG
+    FLE DEBUG
+    MAX 3
+    OUT logs
+    CMT TRACE, DEBUG, INFO, WARN, ERROR, FATAL
+E
+H APPLICATION_SETTINGS
+    H HTTP_REQUEST
+    DOMAIN localhost:8085/api/v1
+    VERIFY certifications/pj-mobius-cert.crt
+    TIMEOUT 60
+    E
+E
+EOF
