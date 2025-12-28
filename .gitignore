@@ -1,5 +1,6 @@
 Server/certifications/
 Server/DB_init/demo_*
+Server/secrets/
 
 Client/logs/
 Client/certifications/
