@@ -14,13 +14,20 @@ class SessionUpdate:
 
         try:
 
-            TableAdapters.SessionInfoTableAdapters().UpdateLogout(token, update)
+            tableAdapter = TableAdapters.SessionInfoTableAdapters()
+            tableAdapter.UpdateLogout(token, update)
             return True
 
         except Exception as e:
 
             self.Logger.ShowError(e, "Failed to logout.")
             raise
+
+        finally:
+
+            if 'tableAdapter' in locals():
+
+                tableAdapter.closeConnection()
 
     def CreateNewSession(self, userInfo) -> tuple | None:
 
@@ -63,6 +70,12 @@ class SessionUpdate:
             self.Logger.ShowError(e, "Failed to create new session.")
             raise
 
+        finally:
+
+            if 'tableAdapter' in locals():
+
+                tableAdapter.closeConnection()
+
 class CheckSession:
 
     def __init__(self, token):
@@ -76,6 +89,11 @@ class CheckSession:
         # Table adapter
 
         self.tableAdapter = TableAdapters.SessionInfoTableAdapters()
+
+    def close(self):
+
+        self.tableAdapter.closeConnection()
+        self.Logger.Info("Closed CheckSession object.")
 
     def IsValid(self, updateSessionTime=True):
 

@@ -16,6 +16,12 @@ class CompanyManager:
         self.Session = Session.CheckSession(token)
         self.sessionToken = token
 
+    def close(self):
+
+        self.CompanyAdapter.closeConnection()
+        self.Session.close()
+        self.Logger.Info("Closed CompanyManager object.")
+
     def getCompanyList(self, str,companyID: int | None = None, companyName: str | None = None, contractLevel: int | None = None) -> tuple[tuple] | None:
         
         # Get company list

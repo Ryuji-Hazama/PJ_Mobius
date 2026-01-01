@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS ContractCompanies (
     company_zip_code VARCHAR(10),
     company_address TEXT,
     company_email VARCHAR(100),
-    contract_level INT,
+    contract_level INT NOT NULL,
     created_user_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_user_id INT,

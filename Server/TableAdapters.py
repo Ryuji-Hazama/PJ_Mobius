@@ -31,25 +31,6 @@ class DbConnection:
 
             raise
 
-class CompanyTableAdapters:
-
-    def __init__(self):
-        
-        # Logging objects
-
-        self.Logger = maplex.Logger("TableAdapters: Company")
-
-        try:
-
-            self.connection = DbConnection().connect()
-            self.cursor = self.connection.cursor()
-            self.Logger.Info("Database connection established.")
-
-        except Exception as e:
-
-            self.Logger.ShowError(e, "Failed to connect database.")
-            raise
-
 class UserTableAdapters:
 
     def __init__(self):
@@ -67,6 +48,19 @@ class UserTableAdapters:
         except Exception as e:
 
             self.Logger.ShowError(e, "Failed to connect database.")
+            raise
+
+    def closeConnection(self):
+
+        try:
+
+            self.cursor.close()
+            self.connection.close()
+            self.Logger.Info("Database connection closed.")
+
+        except Exception as e:
+
+            self.Logger.ShowError(e, "Failed to close database connection.")
             raise
 
     #######################################
@@ -238,6 +232,19 @@ class SessionInfoTableAdapters:
             self.Logger.ShowError(e, "Failed to connect database.")
             raise
 
+    def closeConnection(self):
+
+        try:
+
+            self.cursor.close()
+            self.connection.close()
+            self.Logger.Info("Database connection closed.")
+
+        except Exception as e:
+
+            self.Logger.ShowError(e, "Failed to close database connection.")
+            raise
+
     #################################
     # Insert
 
@@ -351,6 +358,26 @@ class CompanyTableAdapters:
 
             self.Logger.ShowError(e, "Failed to connect database.")
             raise
+
+    def closeConnection(self):
+
+        try:
+
+            self.cursor.close()
+            self.connection.close()
+            self.Logger.Info("Database connection closed.")
+
+        except Exception as e:
+
+            self.Logger.ShowError(e, "Failed to close database connection.")
+            raise
+
+    #################################
+    # Insert
+
+    def insertCompany(self, companyName: str, companyPhone: str, companyZipCode: str, companyAddress: str, companyEmail: str, contractLevel: int, createUserId: int | None = None) -> bool:
+
+        pass
 
     #################################
     # Select

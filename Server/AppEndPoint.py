@@ -272,7 +272,8 @@ def getLogin(item: LoginRequestItem):
 
     try:
 
-        retItemDict = User.UserLogin(item.UserName, item.Password).Login()
+        userLogin = User.UserLogin(item.UserName, item.Password)
+        retItemDict = userLogin.Login()
 
         retItem.LoginResult = loginResult(**retItemDict["LoginResult"])
         retItem.SessionInfo = sessionInfo(**retItemDict["SessionInfo"])
@@ -283,6 +284,12 @@ def getLogin(item: LoginRequestItem):
         Logger.ShowError(e, "Failed to login.")
         retItem.ErrorInfo.Error = True
         retItem.ErrorInfo.ErrorMessage = f"{e}"
+
+    finally:
+
+        if 'userLogin' in locals():
+
+            userLogin.close()
 
     return retItem
 
@@ -343,6 +350,12 @@ def getSessionInfo(item: UpdateSessionTimeRequestItem):
         retItem.ErrorInfo.Error = True
         retItem.ErrorInfo.ErrorMessage = f"{e}"
 
+    finally:
+
+        if 'sessionInfo' in locals():
+
+            sessionInfo.close()
+
     return retItem
 
 #####################################
@@ -360,13 +373,20 @@ def putPassword(item: UpdatePasswordRequestItem):
 
     try:
 
-        retItem = User.UserPasswordUpdate(item.UserName, item.NewPassword, item.Token, item.OldPassword).Update()
+        userPasswordUpdate = User.UserPasswordUpdate(item.UserName, item.NewPassword, item.Token, item.OldPassword)
+        userPasswordUpdate.Update()
 
     except Exception as e:
 
         Logger.ShowError(e, "Failed to update password.")
         retItem.ErrorInfo.Error = True
         retItem.ErrorInfo.ErrorMessage = f"{e}"
+
+    finally:
+
+        if 'userPasswordUpdate' in locals():
+
+            userPasswordUpdate.close()
 
     return retItem
 
@@ -382,7 +402,16 @@ def postUserInfo(item: PostUserInfoRequestItem):
 
     try:
 
-        retDict = User.UserInfo(item.Token).addUser(item.UserName, item.Email, item.Password, item.InitialPassword, item.AccessLevel, item.UserStatus, item.CompanyID)
+        userInfo = User.UserInfo(item.Token)
+        retDict = userInfo.addUser(
+            item.UserName,
+            item.Email,
+            item.Password,
+            item.InitialPassword,
+            item.AccessLevel,
+            item.UserStatus,
+            item.CompanyID
+            )
         retItem.Created = retDict["Created"]
         retItem.UserID = retDict["UserID"]
         retItem.ErrorInfo = errorInfo(**retDict["ErrorInfo"])
@@ -392,6 +421,12 @@ def postUserInfo(item: PostUserInfoRequestItem):
         Logger.ShowError(e, "Failed to post user information.")
         retItem.ErrorInfo.Error = True
         retItem.ErrorInfo.ErrorMessage = f"{e}"
+
+    finally:
+
+        if 'userInfo' in locals():
+
+            userInfo.close()
 
     return retItem
 
@@ -406,7 +441,16 @@ def getUserInfo(item: GetUserInfoRequestItem):
 
     try:
 
-        retItemDict = User.UserInfo(item.Token).getUserInfo(userId=item.UserID, userName=item.UserName, eMail=item.Email, accessLevel=item.AccessLevel, companyId=item.CompanyID, userStatus=item.UserStatus, active=item.Active)
+        userInfo = User.UserInfo(item.Token)
+        retItemDict = userInfo.getUserInfo(
+            userId=item.UserID,
+            userName=item.UserName,
+            eMail=item.Email,
+            accessLevel=item.AccessLevel,
+            companyId=item.CompanyID,
+            userStatus=item.UserStatus,
+            active=item.Active
+            )
         retItem.Users = [UserInfoResponseItem(**user) for user in retItemDict["Users"]]
         retItem.ErrorInfo = errorInfo(**retItemDict["ErrorInfo"])
 
@@ -415,6 +459,12 @@ def getUserInfo(item: GetUserInfoRequestItem):
         Logger.ShowError(e, "Failed to get user information.")
         retItem.ErrorInfo.Error = True
         retItem.ErrorInfo.ErrorMessage = f"{e}"
+
+    finally:
+        
+        if 'userInfo' in locals():
+
+            userInfo.close()
 
     return retItem
 
@@ -429,7 +479,8 @@ def getCompanyInfo(item: GetCompanyInfoRequestItem):
 
     try:
 
-        retDict = Company.CompanyManager(item.Token).getCompanyList(str,item.CompanyID, item.CompanyName, item.ContractLevel)
+        companyManager = Company.CompanyManager(item.Token)
+        retDict = companyManager.getCompanyList(str,item.CompanyID, item.CompanyName, item.ContractLevel)
 
         # Break down company list
 
@@ -453,6 +504,12 @@ def getCompanyInfo(item: GetCompanyInfoRequestItem):
         Logger.ShowError(e, "Failed to get company information.")
         retItem.ErrorInfo.Error = True
         retItem.ErrorInfo.ErrorMessage = f"{e}"
+
+    finally:
+
+        if 'companyManager' in locals():
+
+            companyManager.close()
 
     return retItem
 

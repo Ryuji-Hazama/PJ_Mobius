@@ -20,6 +20,11 @@ class UserLogin:
 
         self.Logger.Info(f"UserLogin instance created for user [{self.userName}].")
 
+    def close(self):
+
+        self.userTableAdapter.closeConnection()
+        self.Logger.Info("Closed UserLogin object.")
+
     def updateLoginFailed(self, userId: int, failedCount: int, failedAt: datetime.datetime | None = None) -> str:
 
         try:
@@ -235,6 +240,12 @@ class UserPasswordUpdate:
         self.userTableAdapter = TableAdapters.UserTableAdapters()
         self.sessionTableAdapter = Session.CheckSession(token)
 
+    def close(self):
+
+        self.userTableAdapter.closeConnection()
+        self.sessionTableAdapter.close()
+        self.Logger.Info("Closed UserPasswordUpdate object.")
+
     def Update(self):
 
         retDict = {"Update": False, "Message": "", "ErrorInfo": {"Error": False, "ErrorMessage": ""}}
@@ -352,6 +363,12 @@ class UserInfo:
         # Variables
 
         self.token = token
+
+    def close(self):
+
+        self.userTableAdapter.closeConnection()
+        self.sessionData.close()
+        self.Logger.Info("Closed UserInfo object.")
 
     def getUserInfo(self, userId: int | None = None, userName: str | None = None, eMail: str | None = None, accessLevel: str | None = None, companyId: int | None = None, userStatus: str | None = None, active: bool | None = None) -> list[dict] | None:
 
