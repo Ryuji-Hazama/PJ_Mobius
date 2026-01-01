@@ -22,23 +22,29 @@ class App:
 
     def switchWindow(self, targetWindow):
 
-        self.Logger.Info(f"Switching to [{targetWindow}] window.")
+        try:
 
-        if self.current_frame:
+            self.Logger.Info(f"Switching to [{targetWindow}] window.")
 
-            self.current_frame.destroy()
+            if self.current_frame:
 
-        if targetWindow == "Login":
+                self.current_frame.destroy()
 
-            self.root.title("Login Form")
-            self.root.resizable(False, False)
-            self.current_frame = PJ_Mobius_Login.LogInForm(self.root, self.switchWindow)
+            if targetWindow == "Login":
 
-        elif targetWindow == "Main":
+                self.root.title("Login Form")
+                self.root.resizable(False, False)
+                self.current_frame = PJ_Mobius_Login.LogInForm(self.root, self.switchWindow)
 
-            self.root.title("Main Menu")
-            self.root.resizable(True, True)
-            self.current_frame = PJ_Mobius_Main.MainMenuForm(self.root, self.switchWindow)
+            elif targetWindow == "Main":
+
+                self.root.title("Main Menu")
+                self.root.resizable(True, True)
+                self.current_frame = PJ_Mobius_Main.MainMenuForm(self.root, self.switchWindow)
+
+        except Exception as e:
+
+            self.Logger.ShowError(e, f"Failed to switch window to [{targetWindow}]", True)
 
     def run(self):
 

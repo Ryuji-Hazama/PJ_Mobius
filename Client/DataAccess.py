@@ -272,7 +272,7 @@ class UserInfo:
         
         """ Post user info to server. """
 
-        retDict = None
+        retDict = {"Created": False, "ErrorInfo": {"Error": False}}
 
         try:
 
@@ -285,7 +285,7 @@ class UserInfo:
 
                 self.Logger.Warn(f"User '{userData.get('UserName')}' already exists.")
                 PJ_Mobius_Dialog.Dialog("Error", f"User '{userData.get('UserName')}' already exists. Please choose a different user name.").showDialog()
-                return None
+                return retDict
             
             existingUser = self.getUserInfo(eMail=userData.get("Email"))
 
@@ -293,7 +293,7 @@ class UserInfo:
 
                 self.Logger.Warn(f"E-Mail '{userData.get('Email')}' is already registered.")
                 PJ_Mobius_Dialog.Dialog("Error", f"E-Mail '{userData.get('Email')}' is already registered. Please use a different E-Mail address.").showDialog()
-                return None
+                return retDict
             
             self.Logger.Info("No existing user found. Proceeding to post new user info.")
 
@@ -338,7 +338,6 @@ class UserInfo:
                     if retDict.get("ErrorInfo", {}).get("Error", False):
 
                         self.Logger.Error(f"Error in post user info response: {retDict.get('ErrorInfo', {}).get('ErrorMessage', '')}")
-                        retDict = None
                         return
 
                 except Exception as e:

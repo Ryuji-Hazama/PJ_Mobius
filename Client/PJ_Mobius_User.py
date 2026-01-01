@@ -48,23 +48,29 @@ class AddUserForm(ttk.Frame):
 
     def clearForm(self):
         
-        # Clear all form fields
+        try:
 
-        self.userName.set("")
-        self.email.set("")
-        self.password.set("")
-        self.confirmPassword.set("")
-        self.initialPassword.set(True)
-        self.accessLevel.set("")
-        self.combo_accessLevel.current(0)
-        self.userStatus.set("active")
+            # Clear all form fields
 
-        if self.userAccessLevel == "super":
+            self.userName.set("")
+            self.email.set("")
+            self.password.set("")
+            self.confirmPassword.set("")
+            self.initialPassword.set(True)
+            self.accessLevel.set("")
+            self.combo_accessLevel.current(0)
+            self.userStatus.set("active")
 
-            self.company.set("")
-            self.combo_company.current(0)
+            if self.userAccessLevel == "super" and len(self.companyList) > 0:
 
-        self.Logger.Info("Add User form cleared.")
+                self.company.set("")
+                self.combo_company.current(0)
+
+            self.Logger.Info("Add User form cleared.")
+
+        except Exception as e:
+
+            self.Logger.ShowError(e, "Failed to clear Add User form.")
 
     def checkEntries(self) -> bool:
 
@@ -128,9 +134,15 @@ class AddUserForm(ttk.Frame):
 
         accessLevel = self.accessLevel.get().lower()
 
-        if self.userAccessLevel == "super" and accessLevel != "super":
+        if self.userAccessLevel == "super":
+            
+            if accessLevel == "super":
 
-            companyId = self.companyList[self.company.get()]
+                companyId = None
+
+            else:
+
+                companyId = self.companyList[self.company.get()]
 
         else:
 
@@ -158,10 +170,21 @@ class AddUserForm(ttk.Frame):
 
         # Send request to server
 
-        if not DataAccess.UserInfo().postUserInfo(requestPayload):
+        responseDict = DataAccess.UserInfo().postUserInfo(requestPayload)
+        if responseDict is None:
 
             self.Logger.Error("Failed to add new user.")
             PJ_Mobius_Dialog.Dialog("Error", "Failed to add new user. Please check the logs for details.").showDialog()
+            return
+
+        elif responseDict.get("Created", False) is not True:
+
+            if responseDict.get("ErrorInfo", {}).get("Error", False):
+
+                errorMessage = responseDict.get("ErrorInfo").get("ErrorMessage", "Unknown error.")
+                PJ_Mobius_Dialog.Dialog("Error", f"Failed to add new user.\n{errorMessage}").showDialog()
+                self.Logger.Error(f"Failed to add new user: {errorMessage}")
+
             return
         
         PJ_Mobius_Dialog.Dialog("Info", "New user added successfully.").showDialog()

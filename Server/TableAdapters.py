@@ -31,13 +31,32 @@ class DbConnection:
 
             raise
 
+class CompanyTableAdapters:
+
+    def __init__(self):
+        
+        # Logging objects
+
+        self.Logger = maplex.Logger("TableAdapters: Company")
+
+        try:
+
+            self.connection = DbConnection().connect()
+            self.cursor = self.connection.cursor()
+            self.Logger.Info("Database connection established.")
+
+        except Exception as e:
+
+            self.Logger.ShowError(e, "Failed to connect database.")
+            raise
+
 class UserTableAdapters:
 
     def __init__(self):
 
         # Logging objects
 
-        self.Logger = maplex.Logger(f"TableAdapters: Users")
+        self.Logger = maplex.Logger("TableAdapters: Users")
 
         try:
 
