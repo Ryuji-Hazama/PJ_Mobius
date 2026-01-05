@@ -1,8 +1,7 @@
-import datetime
 import maplex
 from fastapi import FastAPI
-from pydantic import BaseModel
 
+import BaseModelData as BMD
 import Company
 import initSuperUser
 import Session
@@ -22,207 +21,13 @@ app = FastAPI()
 Logger.Info("FastAPI initialized.")
 v1Root = "/api/v1"
 
-#####################################
-# Error info class
-
-class errorInfo(BaseModel):
-
-    Error: bool = False
-    ErrorMessage: str | None = None
-
-############################################
-# Request item class
-############################################
-# Init super user request item class
-
-class InitSuperUserItem(BaseModel):
-
-    Password: str | None = None
-    SuperUserName: str | None = None
-    SuperUserPassword: str | None = None
-
-############################################
-# Login request item class
-
-class LoginRequestItem(BaseModel):
-
-    UserName: str | None = None
-    Password: str | None = None
-
-############################################
-# Logout/UpdateSessionTime request item class
-
-class UpdateSessionTimeRequestItem(BaseModel):
-
-    Token: str | None = None
-    Update: str = "00:30:00"
-
-############################################
-# Update password request item class
-
-class UpdatePasswordRequestItem(BaseModel):
-
-    Token: str | None = None
-    UserName: str | None = None
-    OldPassword: str | None = None
-    NewPassword: str | None = None
-
-############################################
-# Get user info request item class
-
-class GetUserInfoRequestItem(BaseModel):
-
-    Token: str | None = None
-    UserID: int | None = None
-    UserName: str | None = None
-    Email: str | None = None
-    AccessLevel: str | None = None
-    CompanyID: int | None = None
-    UserStatus: str | None = None
-    Active: bool | None = None
-
-############################################
-# Post user info request item class
-
-class PostUserInfoRequestItem(BaseModel):
-
-    Token: str | None = None
-    UserName: str | None = None
-    Email: str | None = None
-    Password: str | None = None
-    InitialPassword: int | None = None
-    AccessLevel: str | None = None
-    UserStatus: str | None = None
-    CompanyID: int | None = None
-
-############################################
-# Get company info request item class
-
-class GetCompanyInfoRequestItem(BaseModel):
-
-    Token: str | None = None
-    CompanyID: int | None = None
-    CompanyName: str | None = None
-    ContractLevel: int | None = None
-
-############################################
-# Response item class
-############################################
-# Health check response item
-
-class HealthCheckResponse(BaseModel):
-
-    ResponseMessage: str
-
-############################################
-# Init super user response item class
-
-class InitSuperResponse(BaseModel):
-
-    Registered: bool | None = None
-    ErrorInfo: errorInfo = errorInfo()
-
-############################################
-# Login request response item class
-
-class loginResult(BaseModel):
-
-    Login: bool = False
-    Token: str | None = None
-    Message: str | None = None
-    InitialPassword: bool = False
-
-class sessionInfo(BaseModel):
-
-    UserID: int | None = None
-    CompanyID: int | None = None
-    AccessLevel: str | None = None
-    LogoutTime: datetime.datetime | None = None
-
-class LoginRequestResponse(BaseModel):
-
-    LoginResult: loginResult = loginResult()
-    SessionInfo: sessionInfo = sessionInfo()
-    ErrorInfo: errorInfo = errorInfo()
-
-############################################
-# Logout/UpdateSessionTime request response item class
-
-class UpdateSessionRequestResponse(BaseModel):
-
-    Update: bool = False
-    ErrorInfo: errorInfo = errorInfo()
-
-############################################
-# Update password request response item class
-
-class UpdatePasswordRequestResponse(BaseModel):
-
-    Update: bool = False
-    Message: str | None = None
-    ErrorInfo: errorInfo = errorInfo()
-
-############################################
-# Get session info response item class
-
-class SessionInfoResponse(BaseModel):
-
-    Session: bool = False
-    SessionInfo: sessionInfo = sessionInfo()
-    ErrorInfo: errorInfo = errorInfo()
-
-############################################
-# Get user info response item class
-
-class UserInfoResponseItem(BaseModel):
-
-    UserID: int | None = None
-    UserName: str | None = None
-    Email: str | None = None
-    AccessLevel: str | None = None
-    CompanyID: int | None = None
-    UserStatus: str | None = None
-    Active: bool | None = None
-
-class GetUserInfoResponse(BaseModel):
-
-    Users: list[UserInfoResponseItem] = []
-    ErrorInfo: errorInfo = errorInfo()
-
-############################################
-# Post user info response item class
-
-class PostUserInfoResponse(BaseModel):
-
-    Created: bool = False
-    UserID: int | None = None
-    ErrorInfo: errorInfo = errorInfo()
-
-############################################
-# Get company info response item class
-
-class CompanyInfoResponseItem(BaseModel):
-    
-    CompanyID: int | None = None
-    CompanyName: str | None = None
-    CompanyPhone: str | None = None
-    CompanyZipCode: str | None = None
-    CompanyAddress: str | None = None
-    CompanyEmail: str | None = None
-    ContractLevel: int | None = None
-
-class GetCompanyInfoResponse(BaseModel):
-
-    Companies: list[CompanyInfoResponseItem] = []
-    ErrorInfo: errorInfo = errorInfo()
-
 ############################################
 # Main methods
 ############################################
 # Initialize super user data
 
-@app.post(f"{v1Root}/initsuper", response_model=InitSuperResponse)
-def initSuperReceived(item: InitSuperUserItem):
+@app.post(f"{v1Root}/initsuper", response_model=BMD.InitSuperResponse)
+def initSuperReceived(item: BMD.InitSuperUserItem):
 
     Logger.Info("Init super user request received.")
 
@@ -232,7 +37,7 @@ def initSuperReceived(item: InitSuperUserItem):
 
     # Initialize response item
 
-    resultItem = InitSuperResponse()
+    resultItem = BMD.InitSuperResponse()
     resultItem.Registered = False
     resultItem.ErrorInfo.ErrorMessage = None
 
@@ -258,11 +63,11 @@ def initSuperReceived(item: InitSuperUserItem):
 #################################
 # Login
 
-@app.get(f"{v1Root}/login", response_model=LoginRequestResponse)
-def getLogin(item: LoginRequestItem):
+@app.get(f"{v1Root}/login", response_model=BMD.LoginRequestResponse)
+def getLogin(item: BMD.LoginRequestItem):
 
     Logger.Info(f"Login request received: {item.UserName}")
-    retItem = LoginRequestResponse()
+    retItem = BMD.LoginRequestResponse()
 
     if "" in {item.UserName, item.Password}:
 
@@ -275,9 +80,9 @@ def getLogin(item: LoginRequestItem):
         userLogin = User.UserLogin(item.UserName, item.Password)
         retItemDict = userLogin.Login()
 
-        retItem.LoginResult = loginResult(**retItemDict["LoginResult"])
-        retItem.SessionInfo = sessionInfo(**retItemDict["SessionInfo"])
-        retItem.ErrorInfo = errorInfo(**retItemDict["ErrorInfo"])
+        retItem.LoginResult = BMD.loginResult(**retItemDict["LoginResult"])
+        retItem.SessionInfo = BMD.sessionInfo(**retItemDict["SessionInfo"])
+        retItem.ErrorInfo = BMD.errorInfo(**retItemDict["ErrorInfo"])
 
     except Exception as e:
 
@@ -293,14 +98,14 @@ def getLogin(item: LoginRequestItem):
 
     return retItem
 
-@app.patch(f"{v1Root}/session", response_model=UpdateSessionRequestResponse)
-def patchSession(item: UpdateSessionTimeRequestItem):
+@app.patch(f"{v1Root}/session", response_model=BMD.UpdateSessionRequestResponse)
+def patchSession(item: BMD.UpdateSessionTimeRequestItem):
 
     # Update session time
     # Also used to log out (set update time to 00:00:00)
 
     Logger.Info(f"Session update request received: {item.model_dump()}")
-    retItem = UpdateSessionRequestResponse()
+    retItem = BMD.UpdateSessionRequestResponse()
 
     try:
 
@@ -314,11 +119,11 @@ def patchSession(item: UpdateSessionTimeRequestItem):
 
     return retItem
 
-@app.get(f"{v1Root}/session", response_model=SessionInfoResponse)
-def getSessionInfo(item: UpdateSessionTimeRequestItem):
+@app.get(f"{v1Root}/session", response_model=BMD.SessionInfoResponse)
+def getSessionInfo(item: BMD.UpdateSessionTimeRequestItem):
 
     Logger.Info(f"Get session info request received: {item.model_dump()}")
-    retItem = SessionInfoResponse()
+    retItem = BMD.SessionInfoResponse()
 
     try:
 
@@ -361,11 +166,11 @@ def getSessionInfo(item: UpdateSessionTimeRequestItem):
 #####################################
 # Update password
 
-@app.patch(f"{v1Root}/password", response_model=UpdatePasswordRequestResponse)
-def putPassword(item: UpdatePasswordRequestItem):
+@app.patch(f"{v1Root}/password", response_model=BMD.UpdatePasswordRequestResponse)
+def putPassword(item: BMD.UpdatePasswordRequestItem):
 
     Logger.Info(f"Password update request received: {item.UserName}")
-    retItem = UpdatePasswordRequestResponse()
+    retItem = BMD.UpdatePasswordRequestResponse()
 
     # If the old password is None, it is an higher-level user changing another user's password.
     # In this case, need to compare the token's user privilege with the target user's privilege.
@@ -374,7 +179,7 @@ def putPassword(item: UpdatePasswordRequestItem):
     try:
 
         userPasswordUpdate = User.UserPasswordUpdate(item.UserName, item.NewPassword, item.Token, item.OldPassword)
-        userPasswordUpdate.Update()
+        retItem = userPasswordUpdate.Update()
 
     except Exception as e:
 
@@ -393,12 +198,12 @@ def putPassword(item: UpdatePasswordRequestItem):
 #####################################
 # Post user info
 
-@app.post(f"{v1Root}/user", response_model=PostUserInfoResponse)
-def postUserInfo(item: PostUserInfoRequestItem):
+@app.post(f"{v1Root}/user", response_model=BMD.PostUserInfoResponse)
+def postUserInfo(item: BMD.PostUserInfoRequestItem):
 
     Logger.Info(f"Post user info request received.")
     # No model dump for security reason
-    retItem = PostUserInfoResponse()
+    retItem = BMD.PostUserInfoResponse()
 
     try:
 
@@ -414,7 +219,7 @@ def postUserInfo(item: PostUserInfoRequestItem):
             )
         retItem.Created = retDict["Created"]
         retItem.UserID = retDict["UserID"]
-        retItem.ErrorInfo = errorInfo(**retDict["ErrorInfo"])
+        retItem.ErrorInfo = BMD.errorInfo(**retDict["ErrorInfo"])
 
     except Exception as e:
 
@@ -433,11 +238,11 @@ def postUserInfo(item: PostUserInfoRequestItem):
 #####################################
 # Get user info
 
-@app.get(f"{v1Root}/user", response_model=GetUserInfoResponse)
-def getUserInfo(item: GetUserInfoRequestItem):
+@app.get(f"{v1Root}/user", response_model=BMD.GetUserInfoResponse)
+def getUserInfo(item: BMD.GetUserInfoRequestItem):
 
     Logger.Info(f"Get user info request received: {item.model_dump()}")
-    retItem = GetUserInfoResponse()
+    retItem = BMD.GetUserInfoResponse()
 
     try:
 
@@ -451,8 +256,8 @@ def getUserInfo(item: GetUserInfoRequestItem):
             userStatus=item.UserStatus,
             active=item.Active
             )
-        retItem.Users = [UserInfoResponseItem(**user) for user in retItemDict["Users"]]
-        retItem.ErrorInfo = errorInfo(**retItemDict["ErrorInfo"])
+        retItem.Users = [BMD.UserInfoResponseItem(**user) for user in retItemDict["Users"]]
+        retItem.ErrorInfo = BMD.errorInfo(**retItemDict["ErrorInfo"])
 
     except Exception as e:
 
@@ -469,13 +274,16 @@ def getUserInfo(item: GetUserInfoRequestItem):
     return retItem
 
 #####################################
+# Post company informations
+
+#####################################
 # Get company informations
 
-@app.get(f"{v1Root}/company", response_model=GetCompanyInfoResponse)
-def getCompanyInfo(item: GetCompanyInfoRequestItem):
+@app.get(f"{v1Root}/company", response_model=BMD.GetCompanyInfoResponse)
+def getCompanyInfo(item: BMD.GetCompanyInfoRequestItem):
 
     Logger.Info(f"Get company info request received: {item.model_dump()}")
-    retItem = GetCompanyInfoResponse()
+    retItem = BMD.GetCompanyInfoResponse()
 
     try:
 
@@ -486,7 +294,7 @@ def getCompanyInfo(item: GetCompanyInfoRequestItem):
 
         for company in retDict["CompanyList"]:
 
-            companyItem = CompanyInfoResponseItem()
+            companyItem = BMD.CompanyInfoResponseItem()
             companyItem.CompanyID = company[0]
             companyItem.CompanyName = company[1]
             companyItem.CompanyPhone = company[2]
@@ -497,7 +305,7 @@ def getCompanyInfo(item: GetCompanyInfoRequestItem):
 
             retItem.Companies.append(companyItem)
 
-        retItem.ErrorInfo = errorInfo(**retDict["ErrorInfo"])
+        retItem.ErrorInfo = BMD.errorInfo(**retDict["ErrorInfo"])
 
     except Exception as e:
 
@@ -516,7 +324,7 @@ def getCompanyInfo(item: GetCompanyInfoRequestItem):
 #####################################
 # Health check
 
-@app.get("/healthcheck", response_model=HealthCheckResponse)
+@app.get("/healthcheck", response_model=BMD.HealthCheckResponse)
 def HealthCheck():
 
     return {"ResponseMessage": "Hello from PJ_Mobius."}

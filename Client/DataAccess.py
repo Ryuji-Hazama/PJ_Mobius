@@ -147,7 +147,7 @@ class SessionInfo:
 
                     if retDict.get("ErrorInfo", {}).get("Error", False):
 
-                        self.Logger.Error(f"Error in get session info response: {retDict.get('ErrorInfo', {}).get('ErrorMessage', '')}")
+                        self.Logger.Error(f"Error in get session info response: {retDict.get('ErrorInfo', {}).get('Message', '')}")
                         retDict = None
                         return
 
@@ -337,7 +337,7 @@ class UserInfo:
 
                     if retDict.get("ErrorInfo", {}).get("Error", False):
 
-                        self.Logger.Error(f"Error in post user info response: {retDict.get('ErrorInfo', {}).get('ErrorMessage', '')}")
+                        self.Logger.Error(f"Error in post user info response: {retDict.get('ErrorInfo', {}).get('Message', '')}")
                         return
 
                 except Exception as e:
@@ -443,7 +443,7 @@ class UserInfo:
 
                     if retDict.get("ErrorInfo", {}).get("Error", False):
 
-                        self.Logger.Error(f"Error in get user info response: {retDict.get('ErrorInfo', {}).get('ErrorMessage', '')}")
+                        self.Logger.Error(f"Error in get user info response: {retDict.get('ErrorInfo', {}).get('Message', '')}")
                         retDict = None
                         return
 
@@ -594,7 +594,7 @@ class CompanyInfo:
 
                     if retDict.get("ErrorInfo", {}).get("Error", False):
 
-                        self.Logger.Error(f"Error in get company info response: {retDict.get('ErrorInfo', {}).get('ErrorMessage', '')}")
+                        self.Logger.Error(f"Error in get company info response: {retDict.get('ErrorInfo', {}).get('Message', '')}")
                         retDict = None
                         return
 

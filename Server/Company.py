@@ -22,6 +22,51 @@ class CompanyManager:
         self.Session.close()
         self.Logger.Info("Closed CompanyManager object.")
 
+    def createCompany(self, companyName: str | None = None, contractLevel: int | None = None, companyPhone: str | None = None, companyZipCode: str | None = None, companyAddress: str | None = None, companyEmail: str | None = None) -> dict:
+
+        # Create a new company
+
+        retDict = {"CompanyID": None, "ErrorInfo": {"Error": False, "Message": ""}}
+        
+        try:
+
+            # Check the session validity
+
+            if not self.Session.IsValid():
+
+                retDict["ErrorInfo"]["Error"] = True
+                retDict["ErrorInfo"]["Message"] = "Invalid session."
+                return retDict
+            
+            if companyName is None or contractLevel is None:
+
+                retDict["ErrorInfo"]["Error"] = True
+                retDict["ErrorInfo"]["Message"] = "Company name and contract level are required."
+                self.Logger.Info("Company name and contract level are required to create a company.")
+                return retDict
+
+            # Insert the new company
+
+            retDict["CompanyID"] = self.CompanyAdapter.insertCompany(companyName, contractLevel, companyPhone, companyZipCode, companyAddress, companyEmail)
+
+            if not retDict["CompanyID"]:
+
+                retDict["ErrorInfo"]["Error"] = True
+                retDict["ErrorInfo"]["Message"] = "Failed to create company."
+                self.Logger.Info("Failed to create a new company.")
+
+            else:
+
+                self.Logger.Info(f"Created new company with ID: {retDict['CompanyID']}")
+
+        except Exception as e:
+
+            self.Logger.ShowError(e, "Failed to create company.")
+            retDict["ErrorInfo"]["Error"] = True
+            retDict["ErrorInfo"]["Message"] = f"Failed to create company: {str(e)}"
+
+        return retDict
+
     def getCompanyList(self, str,companyID: int | None = None, companyName: str | None = None, contractLevel: int | None = None) -> tuple[tuple] | None:
         
         # Get company list

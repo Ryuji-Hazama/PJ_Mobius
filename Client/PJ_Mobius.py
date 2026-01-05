@@ -18,7 +18,18 @@ class App:
         self.current_frame = None
         self.switchWindow("Login")
 
-        self.Logger.Info("App initialized.")
+        self.Logger.Info("""App initialized.
+Welcome to...
+
+\033[92m PPPPPPPP       JJJJJ        \033[91m MM       MM   OOOOOOO   BBBBBBB    IIIIII  UU     UU   SSSSSSS
+\033[92m PP     PP        JJ         \033[91m MMM     MMM  OO     OO  BB    BB     II    UU     UU  SS     SS
+\033[92m PP     PP        JJ         \033[91m MMMM   MMMM  OO     OO  BB    BB     II    UU     UU  SS
+\033[92m PP     PP        JJ         \033[91m MM MM MM MM  OO     OO  BBBBBBB      II    UU     UU   SSSSSSSS
+\033[92m PPPPPPPP         JJ         \033[91m MM  MMM  MM  OO     OO  BB     BB    II    UU     UU          SS
+\033[92m PP               JJ         \033[91m MM       MM  OO     OO  BB     BB    II    UU     UU          SS
+\033[92m PP        JJ     JJ         \033[91m MM       MM  OO     OO  BB     BB    II    UU     UU  SS      SS
+\033[92m PPP        JJJJJJJ  $$$$$$$$\033[91m MM       MM   OOOOOOO   BBBBBBBB   IIIIII   UUUUUUU    SSSSSSSS
+          \033[0m""")
 
     def switchWindow(self, targetWindow):
 

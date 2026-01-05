@@ -377,7 +377,23 @@ class CompanyTableAdapters:
 
     def insertCompany(self, companyName: str, companyPhone: str, companyZipCode: str, companyAddress: str, companyEmail: str, contractLevel: int, createUserId: int | None = None) -> bool:
 
-        pass
+        try:
+
+            # Insert new company info
+
+            sql = f"INSERT INTO ContractCompanies "\
+                f"(company_name, company_phone, company_zipcode, company_address, company_email, contract_level, created_user_id, updated_user_id) "\
+                f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
+            self.cursor.execute(sql, (companyName, companyPhone, companyZipCode, companyAddress, companyEmail, contractLevel, createUserId, createUserId))
+            self.connection.commit()
+            self.Logger.Info("New company info created.")
+
+            return True
+
+        except Exception as e:
+
+            self.Logger.ShowError(e, "Failed to insert new company info.")
+            raise
 
     #################################
     # Select
