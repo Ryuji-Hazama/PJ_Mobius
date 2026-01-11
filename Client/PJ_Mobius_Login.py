@@ -140,7 +140,7 @@ class SetDomainForm(ttk.Frame):
 
             # Update config.mpl
 
-            self.conf.saveTagLine("DOMAIN", domainText, True, "APPLICATION_SETTINGS", "HTTP_REQUEST")
+            self.conf.saveValue("DOMAIN", domainText, "APPLICATION_SETTINGS", "HTTP_REQUEST", save=True)
             self.Logger.Info(f"Domain information saved: {domainText}")
             self.master.destroy()
 
@@ -239,9 +239,9 @@ class Logout:
                 
             elif not response.json()["Update"]:
 
-                self.Logger.Error(f"Failed to logout: {response.json()["ErrorInfo"]["ErrorMessage"]}")
+                self.Logger.Error(f"Failed to logout: {response.json()["ErrorInfo"]["Message"]}")
                 PJ_Mobius_Dialog.Dialog("Warn", "Failed to logout because of the following reason:\n"
-                                        f"{response.json()["ErrorInfo"]["ErrorMessage"]}").showDialog()
+                                        f"{response.json()["ErrorInfo"]["Message"]}").showDialog()
 
         if quit:
 
@@ -336,9 +336,9 @@ class InitPasswordForm(ttk.Frame):
 
             if responseJson["ErrorInfo"]["Error"]:
 
-                self.Logger.Error(f"Error occurred while updating password: {responseJson["ErrorInfo"]["ErrorMessage"]}")
+                self.Logger.Error(f"Error occurred while updating password: {responseJson["ErrorInfo"]["Message"]}")
                 PJ_Mobius_Dialog.Dialog("Warn", f"Failed to update password because of the following error:\n"
-                                        f"{responseJson["ErrorInfo"]["ErrorMessage"]}\n\n"
+                                        f"{responseJson["ErrorInfo"]["Message"]}\n\n"
                                         "Please contact to the support and try later.").showDialog()
                 self.passEnt.focus_set()
                 self.passEnt.select_range(0, END)
@@ -677,9 +677,9 @@ class LogInForm(ttk.Frame):
 
         if responseJson["ErrorInfo"]["Error"]:
 
-            self.Logger.Error(f"Error occrred while login: {responseJson["ErrorInfo"]["ErrorMessage"]}")
+            self.Logger.Error(f"Error occrred while login: {responseJson["ErrorInfo"]["Message"]}")
             PJ_Mobius_Dialog.Dialog("Warn", f"Failed to login because of the following error:\n"
-                                    f"{responseJson["ErrorInfo"]["ErrorMessage"]}\n\n"
+                                    f"{responseJson["ErrorInfo"]["Message"]}\n\n"
                                     "Please contact to the support and try later.").showDialog()
             return
         

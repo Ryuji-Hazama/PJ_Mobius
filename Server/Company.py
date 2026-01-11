@@ -26,7 +26,7 @@ class CompanyManager:
 
         # Create a new company
 
-        retDict = {"CompanyID": None, "ErrorInfo": {"Error": False, "Message": ""}}
+        retDict = {"Success": False, "CompanyID": None, "ErrorInfo": {"Error": False, "Message": ""}}
         
         try:
 
@@ -43,6 +43,17 @@ class CompanyManager:
                 retDict["ErrorInfo"]["Error"] = True
                 retDict["ErrorInfo"]["Message"] = "Company name and contract level are required."
                 self.Logger.Info("Company name and contract level are required to create a company.")
+                return retDict
+
+            # Check for existing company with the same name
+
+            existingCompanies = self.CompanyAdapter.selectCompany(companyName=companyName)
+
+            if existingCompanies:
+
+                retDict["ErrorInfo"]["Error"] = True
+                retDict["ErrorInfo"]["Message"] = f"Company named {companyName} already exists."
+                self.Logger.Info(f"Company named {companyName} already exists.")
                 return retDict
 
             # Insert the new company

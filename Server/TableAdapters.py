@@ -398,8 +398,10 @@ class CompanyTableAdapters:
     #################################
     # Select
 
-    def selectCompany(self, companyId: int | None = None, companyName: str | None = None, contractLevel: int | None = None) -> tuple[tuple] | None:
+    def selectCompany(self, companyId: int | None = None, companyName: str | None = None, contractLevel: int | None = None, orSearch: bool = False) -> tuple[tuple] | None:
 
+        # Select companies by exact match
+        
         if companyId is None and companyName is None and contractLevel is None:
 
             # If the parameters are all empty
@@ -413,12 +415,13 @@ class CompanyTableAdapters:
 
             nextOption = False
             replaceList = []
+            connector = " OR " if orSearch else " AND "
             emptyStrs = {None, ""}
-            sql = "SELECT * FROM ContractCompanies WHERE"
+            sql = "SELECT * FROM ContractCompanies WHERE "
 
             if companyId is not None:
 
-                sql += f" company_id=%s"
+                sql += f"company_id=%s"
                 replaceList.append(companyId)
                 nextOption = True
 
@@ -426,9 +429,9 @@ class CompanyTableAdapters:
 
                 if nextOption:
 
-                    sql += " AND"
+                    sql += connector
 
-                sql += f" company_name=%s"
+                sql += f"company_name=%s"
                 replaceList.append(companyName)
 
                 nextOption = True
@@ -437,12 +440,13 @@ class CompanyTableAdapters:
 
                 if nextOption:
 
-                    sql += " AND"
+                    sql += connector
 
-                sql += f" contract_level=%s"
+                sql += f"contract_level=%s"
                 replaceList.append(contractLevel)
 
             sql += ";"
+            self.Logger.Debug(f"Select Company SQL: {sql} with {replaceList}")
 
             # Execute sql
 
@@ -454,7 +458,7 @@ class CompanyTableAdapters:
             self.Logger.ShowError(e, "Failed to select company informantions.")
             raise
 
-    def searchCompany(self, companyName: str | None = None, companyAddress: str | None = None, companyEmail: str | None = None) -> tuple[tuple] | None:
+    def searchCompany(self, companyName: str | None = None, companyAddress: str | None = None, companyEmail: str | None = None, orSearch: bool = False) -> tuple[tuple] | None:
 
         # Search companies by partial match
 
@@ -471,12 +475,13 @@ class CompanyTableAdapters:
 
             nextOption = False
             replaceList = []
+            connector = " OR " if orSearch else " AND "
             emptyStrs = {None, ""}
-            sql = "SELECT * FROM ContractCompanies WHERE"
+            sql = "SELECT * FROM ContractCompanies WHERE "
 
             if companyName not in emptyStrs:
 
-                sql += f" company_name LIKE %s"
+                sql += f"company_name LIKE %s"
                 replaceList.append(f"%{companyName}%")
                 nextOption = True
 
@@ -484,9 +489,9 @@ class CompanyTableAdapters:
 
                 if nextOption:
 
-                    sql += " AND"
+                    sql += connector
 
-                sql += f" company_address LIKE %s"
+                sql += f"company_address LIKE %s"
                 replaceList.append(f"%{companyAddress}%")
                 nextOption = True
 
@@ -498,9 +503,9 @@ class CompanyTableAdapters:
                 
                 if nextOption:
 
-                    sql += " AND"
+                    sql += connector
 
-                sql += f" company_email LIKE %s"
+                sql += f"company_email LIKE %s"
                 replaceList.append(f"%{companyEmail}%")
 
             sql += ";"

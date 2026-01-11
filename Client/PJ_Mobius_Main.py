@@ -5,6 +5,7 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
 import DataAccess
+import PJ_Mobius_Company
 import PJ_Mobius_Dialog
 import PJ_Mobius_Login
 import PJ_Mobius_User
@@ -55,6 +56,12 @@ class MainMenuForm(ttk.Frame):
         mb_UserManagement["menu"] = menu
         menu.add_command(label="Add User", command=lambda: PJ_Mobius_User.AddUserForm(self.right_f))
         mb_UserManagement.pack(pady=5)
+
+        mb_CompanyManagement = ttk.Menubutton(left_f, text="Company Management", width=20)
+        menu_company = ttk.Menu(mb_CompanyManagement, tearoff=0)
+        mb_CompanyManagement["menu"] = menu_company
+        menu_company.add_command(label="Add Company", command=lambda: PJ_Mobius_Company.AddCompanyForm(self.right_f))
+        mb_CompanyManagement.pack(pady=5)
 
         master.add(left_f)
 

@@ -514,6 +514,98 @@ class CompanyInfo:
 
         self.processWindow = None
 
+    def postCompanyInfo(self, companyData: dict) -> dict | None:
+        
+        """ Post company info to server. """
+
+        # Check if the session is valid
+
+        try:
+
+            if not SessionInfo().checkSession():
+
+                self.Logger.Warn("Session is invalid or expired.")
+                PJ_Mobius_Dialog.Dialog("Warn", "Your session has expired. Please log in again.", "Session Expired").showDialog()
+                return None
+
+        except Exception as e:
+
+            self.Logger.ShowError(e, "Failed to validate session.")
+            PJ_Mobius_Dialog.Dialog("Error", "Failed to validate session. Please log in again.").showDialog()
+            return None
+
+        retDict = None
+
+        try:
+
+            def worker():
+
+                nonlocal retDict
+
+                try:
+
+                    requestJson = companyData
+                    requestJson["Token"] = self.token
+
+                    response = requestToServer("POST", self.domain, requestJson, self.processWindow)
+
+                    if self.processWindow:
+
+                        try:
+
+                            self.processWindow.master.after(0, self.processWindow.closeWindow)
+
+                        except Exception:
+
+                            try:
+
+                                self.processWindow.closeWindow()
+
+                            except Exception:
+
+                                pass
+                            
+                        self.processWindow = None
+
+                    if response.status_code != 200:
+
+                        self.Logger.Error(f"Failed to post company info. Status code: {response.status_code}")
+                        retDict = None
+                        return
+
+                    retDict = response.json()
+                    self.Logger.Debug(f"Post company info response: {retDict}")
+
+                    if retDict.get("ErrorInfo", {}).get("Error", False):
+
+                        self.Logger.Error(f"Error in post company info response: {retDict.get('ErrorInfo', {}).get('Message', '')}")
+                        return
+
+                except Exception as e:
+
+                    self.Logger.ShowError(e, "Failed to post company info to server.")
+                    retDict = None
+
+            self.processWindow = PJ_Mobius_Dialog.ProcessRequest("Posting company info to server...")
+            thread = threading.Thread(target=worker)
+            thread.start()
+            self.processWindow.master.wait_window(self.processWindow)
+
+            thread.join()
+            return retDict
+
+        except Exception as e:
+
+            self.Logger.ShowError(e, "Failed to post company info to server.")
+            return None
+        
+        finally:
+
+            if self.processWindow:
+
+                self.processWindow.closeWindow()
+                self.processWindow = None
+
     def getCompanyInfo(self, companyID: int | None = None, companyName: str | None = None, contractLevel: int | None = None) -> dict | None:
         
         """ Get company info from server. """

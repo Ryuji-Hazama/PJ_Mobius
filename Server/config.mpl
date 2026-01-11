@@ -1,7 +1,7 @@
 MAPLE
 H *LOG_SETTINGS
     FLE DEBUG
-    CMD INFO
+    CMD DEBUG
     MAX 3
     OUT /var/lib/pj-mobius-server/logs
     CMT TRACE, DEBUG, INFO, WARN, ERROR, FATAL

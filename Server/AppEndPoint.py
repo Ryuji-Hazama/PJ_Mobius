@@ -39,12 +39,12 @@ def initSuperReceived(item: BMD.InitSuperUserItem):
 
     resultItem = BMD.InitSuperResponse()
     resultItem.Registered = False
-    resultItem.ErrorInfo.ErrorMessage = None
+    resultItem.ErrorInfo.Message = None
 
     if None in item or "" in item:
 
         resultItem.ErrorInfo.Error = True
-        resultItem.ErrorInfo.ErrorMessage = "Invalid request."
+        resultItem.ErrorInfo.Message = "Invalid request."
         Logger.Error(f"Invalid request item.")
         return resultItem
     
@@ -56,7 +56,7 @@ def initSuperReceived(item: BMD.InitSuperUserItem):
 
         Logger.ShowError(e, "Exception occurred while registering the super user.")
         resultItem.ErrorInfo.Error = True
-        resultItem.ErrorInfo.ErrorMessage = f"{e}"
+        resultItem.ErrorInfo.Message = f"{e}"
 
     return resultItem
 
@@ -88,7 +88,7 @@ def getLogin(item: BMD.LoginRequestItem):
 
         Logger.ShowError(e, "Failed to login.")
         retItem.ErrorInfo.Error = True
-        retItem.ErrorInfo.ErrorMessage = f"{e}"
+        retItem.ErrorInfo.Message = f"{e}"
 
     finally:
 
@@ -115,7 +115,7 @@ def patchSession(item: BMD.UpdateSessionTimeRequestItem):
 
         Logger.ShowError(e, "Failed to update session information.")
         retItem.ErrorInfo.Error = True
-        retItem.ErrorInfo.ErrorMessage = f"{e}"
+        retItem.ErrorInfo.Message = f"{e}"
 
     return retItem
 
@@ -132,7 +132,7 @@ def getSessionInfo(item: BMD.UpdateSessionTimeRequestItem):
         if not sessionInfo.IsValid(False):
 
             retItem.ErrorInfo.Error = True
-            retItem.ErrorInfo.ErrorMessage = "Invalid session."
+            retItem.ErrorInfo.Message = "Invalid session."
             return retItem
 
         sessionData = sessionInfo.GetSessionInfo()
@@ -140,7 +140,7 @@ def getSessionInfo(item: BMD.UpdateSessionTimeRequestItem):
         if not sessionData:
 
             retItem.ErrorInfo.Error = True
-            retItem.ErrorInfo.ErrorMessage = "Session not found."
+            retItem.ErrorInfo.Message = "Session not found."
             return retItem
 
         retItem.Session = True
@@ -153,7 +153,7 @@ def getSessionInfo(item: BMD.UpdateSessionTimeRequestItem):
 
         Logger.ShowError(e, "Failed to get session information.")
         retItem.ErrorInfo.Error = True
-        retItem.ErrorInfo.ErrorMessage = f"{e}"
+        retItem.ErrorInfo.Message = f"{e}"
 
     finally:
 
@@ -185,7 +185,7 @@ def putPassword(item: BMD.UpdatePasswordRequestItem):
 
         Logger.ShowError(e, "Failed to update password.")
         retItem.ErrorInfo.Error = True
-        retItem.ErrorInfo.ErrorMessage = f"{e}"
+        retItem.ErrorInfo.Message = f"{e}"
 
     finally:
 
@@ -225,7 +225,7 @@ def postUserInfo(item: BMD.PostUserInfoRequestItem):
 
         Logger.ShowError(e, "Failed to post user information.")
         retItem.ErrorInfo.Error = True
-        retItem.ErrorInfo.ErrorMessage = f"{e}"
+        retItem.ErrorInfo.Message = f"{e}"
 
     finally:
 
@@ -263,7 +263,7 @@ def getUserInfo(item: BMD.GetUserInfoRequestItem):
 
         Logger.ShowError(e, "Failed to get user information.")
         retItem.ErrorInfo.Error = True
-        retItem.ErrorInfo.ErrorMessage = f"{e}"
+        retItem.ErrorInfo.Message = f"{e}"
 
     finally:
         
@@ -275,6 +275,38 @@ def getUserInfo(item: BMD.GetUserInfoRequestItem):
 
 #####################################
 # Post company informations
+
+@app.post(f"{v1Root}/company", response_model=BMD.PostCompanyResponse)
+def postCompanyInfo(item: BMD.PostCompanyRequestItem):
+
+    Logger.Info(f"Post company info request received: {item.model_dump()}")
+    retItem = BMD.PostCompanyResponse()
+
+    try:
+
+        companyManager = Company.CompanyManager(item.Token)
+        retItem = companyManager.createCompany(
+            item.CompanyName,
+            item.ContractLevel,
+            item.CompanyPhone,
+            item.CompanyZipCode,
+            item.CompanyAddress,
+            item.CompanyEmail
+            )
+
+    except Exception as e:
+
+        Logger.ShowError(e, "Failed to post company information.")
+        retItem.ErrorInfo.Error = True
+        retItem.ErrorInfo.Message = f"{e}"
+
+    finally:
+
+        if 'companyManager' in locals():
+
+            companyManager.close()
+
+    return retItem
 
 #####################################
 # Get company informations
@@ -311,7 +343,7 @@ def getCompanyInfo(item: BMD.GetCompanyInfoRequestItem):
 
         Logger.ShowError(e, "Failed to get company information.")
         retItem.ErrorInfo.Error = True
-        retItem.ErrorInfo.ErrorMessage = f"{e}"
+        retItem.ErrorInfo.Message = f"{e}"
 
     finally:
 

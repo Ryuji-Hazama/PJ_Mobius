@@ -39,6 +39,7 @@ class AddUserForm(ttk.Frame):
 
         self.generateForm()
         self.generateButtons()
+        self.Logger.Info("Add User form initialized.")
 
     def destroyChildren(self, master: ttk.Frame):
 
@@ -181,9 +182,14 @@ class AddUserForm(ttk.Frame):
 
             if responseDict.get("ErrorInfo", {}).get("Error", False):
 
-                errorMessage = responseDict.get("ErrorInfo").get("ErrorMessage", "Unknown error.")
+                errorMessage = responseDict.get("ErrorInfo").get("Message", "Unknown error.")
                 PJ_Mobius_Dialog.Dialog("Error", f"Failed to add new user.\n{errorMessage}").showDialog()
                 self.Logger.Error(f"Failed to add new user: {errorMessage}")
+
+            else:
+
+                PJ_Mobius_Dialog.Dialog("Error", "Failed to add new user due to unknown error.").showDialog()
+                self.Logger.Error("Failed to add new user due to unknown error.")
 
             return
         

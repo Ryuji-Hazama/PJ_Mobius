@@ -111,7 +111,7 @@ class UserLogin:
             "ErrorInfo": 
                    {
                        "Error": False,
-                       "ErrorMessage": ""
+                       "Message": ""
                    }
         }
 
@@ -217,7 +217,7 @@ class UserLogin:
 
             self.Logger.ShowError(e, "Failed to login.")
             retDict["ErrorInfo"]["Error"] = True
-            retDict["ErrorInfo"]["ErrorMessage"] = f"{e}"
+            retDict["ErrorInfo"]["Message"] = f"{e}"
         
         return retDict
 
@@ -248,7 +248,7 @@ class UserPasswordUpdate:
 
     def Update(self):
 
-        retDict = {"Update": False, "Message": "", "ErrorInfo": {"Error": False, "ErrorMessage": ""}}
+        retDict = {"Update": False, "Message": "", "ErrorInfo": {"Error": False, "Message": ""}}
         accessLevel = {"super": 3, "admin": 2, "user": 1, "guest": 0}
 
         try:
@@ -343,7 +343,7 @@ class UserPasswordUpdate:
 
             self.Logger.ShowError(e, "Failed to update password.")
             retDict["ErrorInfo"]["Error"] = True
-            retDict["ErrorInfo"]["ErrorMessage"] = f"{e}"
+            retDict["ErrorInfo"]["Message"] = f"{e}"
 
         return retDict
 
@@ -372,14 +372,14 @@ class UserInfo:
 
     def getUserInfo(self, userId: int | None = None, userName: str | None = None, eMail: str | None = None, accessLevel: str | None = None, companyId: int | None = None, userStatus: str | None = None, active: bool | None = None) -> list[dict] | None:
 
-        retDict = {"Users": [], "ErrorInfo": {"Error": False, "ErrorMessage": ""}}
+        retDict = {"Users": [], "ErrorInfo": {"Error": False, "Message": ""}}
 
         # Check parameters
 
         if userId is None and userName is None and eMail is None and accessLevel is None and companyId is None and userStatus is None:
 
             retDict["ErrorInfo"]["Error"] = True
-            retDict["ErrorInfo"]["ErrorMessage"] = "At least one search condition must be specified."
+            retDict["ErrorInfo"]["Message"] = "At least one search condition must be specified."
             self.Logger.Error("At least one search condition must be specified.")
             return retDict
 
@@ -390,7 +390,7 @@ class UserInfo:
             if not self.sessionData.IsValid(True):
 
                 retDict["ErrorInfo"]["Error"] = True
-                retDict["ErrorInfo"]["ErrorMessage"] = "Session time out."
+                retDict["ErrorInfo"]["Message"] = "Session time out."
                 self.Logger.Error("User session time out.")
                 return retDict
             
@@ -403,14 +403,14 @@ class UserInfo:
             if sessionAccessLevel not in ["super", "admin", "user"]:
 
                 retDict["ErrorInfo"]["Error"] = True
-                retDict["ErrorInfo"]["ErrorMessage"] = "User has no authority to get user information."
+                retDict["ErrorInfo"]["Message"] = "User has no authority to get user information."
                 self.Logger.Error(f"User has no authority to get user information: Access level [{sessionAccessLevel}]")
                 return retDict
             
             if companyId is not None and sessionCompanyId != companyId and sessionAccessLevel != "super":
 
                 retDict["ErrorInfo"]["Error"] = True
-                retDict["ErrorInfo"]["ErrorMessage"] = "User has no authority to get user information.\nCannot search other company user."
+                retDict["ErrorInfo"]["Message"] = "User has no authority to get user information.\nCannot search other company user."
                 self.Logger.Error(f"User has no authority to get user information: Company mismatch. [Session: {sessionCompanyId} / Request: {companyId}]")
                 return retDict
             
@@ -421,14 +421,14 @@ class UserInfo:
                 if accessLevel not in accessLevelDict:
 
                     retDict["ErrorInfo"]["Error"] = True
-                    retDict["ErrorInfo"]["ErrorMessage"] = "Bad access level."
+                    retDict["ErrorInfo"]["Message"] = "Bad access level."
                     self.Logger.Error(f"Bad access level: {accessLevel}")
                     return retDict
                 
                 if accessLevelDict[sessionAccessLevel] <= accessLevelDict[accessLevel] and sessionAccessLevel != "super":
 
                     retDict["ErrorInfo"]["Error"] = True
-                    retDict["ErrorInfo"]["ErrorMessage"] = "User has no authority to get user information.\nCannot search same or higher access level user."
+                    retDict["ErrorInfo"]["Message"] = "User has no authority to get user information.\nCannot search same or higher access level user."
                     self.Logger.Error(f"User has no authority to get user information: Access level too high. [Session: {sessionAccessLevel} / Request: {accessLevel}]")
                     return retDict
                 
@@ -472,12 +472,12 @@ class UserInfo:
 
             self.Logger.ShowError(e, "Failed to get user information.")
             retDict["ErrorInfo"]["Error"] = True
-            retDict["ErrorInfo"]["ErrorMessage"] = f"{e}"
+            retDict["ErrorInfo"]["Message"] = f"{e}"
             return retDict
         
     def addUser(self, userName: str, eMail: str, password: str, initialPassword: int, accessLevel: str, userStatus: str, companyId: int | None = None) -> dict:
 
-        retDict = {"Created": False, "UserID": None, "ErrorInfo": {"Error": False, "ErrorMessage": ""}}
+        retDict = {"Created": False, "UserID": None, "ErrorInfo": {"Error": False, "Message": ""}}
 
         try:
 
@@ -486,7 +486,7 @@ class UserInfo:
             if not self.sessionData.IsValid(True):
 
                 retDict["ErrorInfo"]["Error"] = True
-                retDict["ErrorInfo"]["ErrorMessage"] = "Session time out."
+                retDict["ErrorInfo"]["Message"] = "Session time out."
                 self.Logger.Error("User session time out.")
                 return retDict
             
@@ -499,7 +499,7 @@ class UserInfo:
             if sessionAccessLevel not in ["super", "admin", "user"]:
 
                 retDict["ErrorInfo"]["Error"] = True
-                retDict["ErrorInfo"]["ErrorMessage"] = "Guest user has no authority to add user."
+                retDict["ErrorInfo"]["Message"] = "Guest user has no authority to add user."
                 self.Logger.Error(f"Guest user has no authority to add user: Access level [{sessionAccessLevel}]")
                 return retDict
             
@@ -512,7 +512,7 @@ class UserInfo:
                 elif companyId != sessionInfo[1]:
 
                     retDict["ErrorInfo"]["Error"] = True
-                    retDict["ErrorInfo"]["ErrorMessage"] = "User has no authority to add user.\nCannot add user to other company."
+                    retDict["ErrorInfo"]["Message"] = "User has no authority to add user.\nCannot add user to other company."
                     self.Logger.Error(f"User has no authority to add user: Company mismatch. [Session: {sessionInfo[1]} / Request: {companyId}]")
                     return retDict
                 
@@ -521,28 +521,28 @@ class UserInfo:
             if accessLevel not in ["super", "admin", "user", "guest"]:
 
                 retDict["ErrorInfo"]["Error"] = True
-                retDict["ErrorInfo"]["ErrorMessage"] = "Bad access level."
+                retDict["ErrorInfo"]["Message"] = "Bad access level."
                 self.Logger.Error(f"Bad access level: {accessLevel}")
                 return retDict
 
             if userStatus not in ["active", "inactive", "suspended"]:
 
                 retDict["ErrorInfo"]["Error"] = True
-                retDict["ErrorInfo"]["ErrorMessage"] = "Bad user status."
+                retDict["ErrorInfo"]["Message"] = "Bad user status."
                 self.Logger.Error(f"Bad user status: {userStatus}")
                 return retDict
             
             if not Tools.CheckPasswordPattern(password):
 
                 retDict["ErrorInfo"]["Error"] = True
-                retDict["ErrorInfo"]["ErrorMessage"] = "Bad password: Password must be at least 8 characters long and contain uppercase, lowercase, digit, and special character."
+                retDict["ErrorInfo"]["Message"] = "Bad password: Password must be at least 8 characters long and contain uppercase, lowercase, digit, and special character."
                 self.Logger.Error("Bad password pattern.")
                 return retDict
             
             if accessLevel != "super" and companyId is None:
 
                 retDict["ErrorInfo"]["Error"] = True
-                retDict["ErrorInfo"]["ErrorMessage"] = "Company must be specified for non-Super users."
+                retDict["ErrorInfo"]["Message"] = "Company must be specified for non-Super users."
                 self.Logger.Error("Company must be specified for non-Super users.")
                 return retDict
             
@@ -570,5 +570,5 @@ class UserInfo:
 
             self.Logger.ShowError(e, "Failed to add user.")
             retDict["ErrorInfo"]["Error"] = True
-            retDict["ErrorInfo"]["ErrorMessage"] = f"{e}"
+            retDict["ErrorInfo"]["Message"] = f"{e}"
             return retDict

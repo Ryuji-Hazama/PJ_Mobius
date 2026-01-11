@@ -7,7 +7,7 @@ import datetime
 class errorInfo(BaseModel):
 
     Error: bool = False
-    ErrorMessage: str | None = None
+    Message: str | None = None
 
 ############################################
 # Request item class
@@ -77,7 +77,7 @@ class PostUserInfoRequestItem(BaseModel):
 ############################################
 # Add company request item class
 
-class AddCompanyRequestItem(BaseModel):
+class PostCompanyRequestItem(BaseModel):
 
     Token: str | None = None
     CompanyName: str | None = None
@@ -188,6 +188,15 @@ class PostUserInfoResponse(BaseModel):
 
     Created: bool = False
     UserID: int | None = None
+    ErrorInfo: errorInfo = errorInfo()
+
+############################################
+# Add company response item class
+
+class PostCompanyResponse(BaseModel):
+
+    Success: bool = False
+    CompanyID: int | None = None
     ErrorInfo: errorInfo = errorInfo()
 
 ############################################

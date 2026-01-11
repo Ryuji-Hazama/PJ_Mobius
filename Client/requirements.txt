@@ -1,4 +1,4 @@
-maplex>=2.1.0
+maplex>=2.2.0b1
 pydantic>=2.11.9
 requests>=2.32.5
 ttkbootstrap>=1.18.1
