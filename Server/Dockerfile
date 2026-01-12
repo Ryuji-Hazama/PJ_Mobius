@@ -2,7 +2,14 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
+# Copy application files
 COPY ./*.py /app/
+COPY ./datadomain /app/datadomain
+COPY ./db /app/db
+COPY ./routers /app/routers
+
+# Copy requirements and other necessary files
+
 COPY ./requirements.txt /app/
 COPY ./config.mpl /app
 COPY ./certifications /run/secrets/certifications

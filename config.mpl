@@ -1,0 +1,10 @@
+MAPLE
+H *LOG_SETTINGS
+    CMD INFO
+    FLE INFO
+    # TRACE, DEBUG, INFO, WARN,
+    # ERROR, FATAL, NONE
+    MAX 3
+    OUT logs
+E
+EOF

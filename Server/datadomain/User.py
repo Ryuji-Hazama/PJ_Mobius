@@ -1,7 +1,7 @@
 import datetime
 import maplex
-import Session
-import TableAdapters
+from .Session import SessionUpdate, CheckSession
+from db import UserTableAdapters
 import Tools
 
 class UserLogin:
@@ -16,7 +16,7 @@ class UserLogin:
 
         self.userName = userName
         self.userPassword = Tools.stringHasher().hashString(userPassword, userName)
-        self.userTableAdapter = TableAdapters.UserTableAdapters()
+        self.userTableAdapter = UserTableAdapters()
 
         self.Logger.Info(f"UserLogin instance created for user [{self.userName}].")
 
@@ -187,7 +187,7 @@ class UserLogin:
                 
                 # Create and get new session
 
-                sessionInfo = Session.SessionUpdate().CreateNewSession(userList[0])
+                sessionInfo = SessionUpdate().CreateNewSession(userList[0])
 
                 if not sessionInfo:
 
@@ -237,8 +237,8 @@ class UserPasswordUpdate:
 
         # Table adapters
 
-        self.userTableAdapter = TableAdapters.UserTableAdapters()
-        self.sessionTableAdapter = Session.CheckSession(token)
+        self.userTableAdapter = UserTableAdapters()
+        self.sessionTableAdapter = CheckSession(token)
 
     def close(self):
 
@@ -357,8 +357,8 @@ class UserInfo:
 
         # Table adapters
 
-        self.userTableAdapter = TableAdapters.UserTableAdapters()
-        self.sessionData = Session.CheckSession(token)
+        self.userTableAdapter = UserTableAdapters()
+        self.sessionData = CheckSession(token)
 
         # Variables
 

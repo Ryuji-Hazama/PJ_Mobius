@@ -1,6 +1,6 @@
 import datetime
 import maplex
-import TableAdapters
+from db import SessionInfoTableAdapters
 
 class SessionUpdate:
 
@@ -14,7 +14,7 @@ class SessionUpdate:
 
         try:
 
-            tableAdapter = TableAdapters.SessionInfoTableAdapters()
+            tableAdapter = SessionInfoTableAdapters()
             tableAdapter.UpdateLogout(token, update)
             return True
 
@@ -35,7 +35,7 @@ class SessionUpdate:
 
         try:
 
-            tableAdapter = TableAdapters.SessionInfoTableAdapters()
+            tableAdapter = SessionInfoTableAdapters()
             sessionId = tableAdapter.CreateNewSession(userInfo)
 
             if not sessionId:
@@ -88,7 +88,7 @@ class CheckSession:
 
         # Table adapter
 
-        self.tableAdapter = TableAdapters.SessionInfoTableAdapters()
+        self.tableAdapter = SessionInfoTableAdapters()
 
     def close(self):
 

@@ -4,6 +4,7 @@
 
 ### Server
 
+- Add or option to user select table adapter.
 - Return initial password. //Done
 - use "/api/version/*"
 - /api/user/(id?)" for single user information

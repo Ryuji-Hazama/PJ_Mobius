@@ -3,8 +3,8 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 import os
 
-import DataAccess
-import PJ_Mobius_Dialog
+from api import UserInfo, CompanyInfo
+from ui import Dialog
 
 class AddUserForm(ttk.Frame):
 
@@ -79,25 +79,25 @@ class AddUserForm(ttk.Frame):
 
         if not self.userName.get().strip():
 
-            PJ_Mobius_Dialog.Dialog("Error", "User Name cannot be empty.").showDialog()
+            Dialog("Error", "User Name cannot be empty.").showDialog()
             self.entry_UserName.focus_set()
             return False
 
         if not self.email.get().strip():
 
-            PJ_Mobius_Dialog.Dialog("Error", "E-Mail cannot be empty.").showDialog()
+            Dialog("Error", "E-Mail cannot be empty.").showDialog()
             self.entry_email.focus_set()
             return False
 
         if not self.password.get():
 
-            PJ_Mobius_Dialog.Dialog("Error", "Password cannot be empty.").showDialog()
+            Dialog("Error", "Password cannot be empty.").showDialog()
             self.entry_password.focus_set()
             return False
 
         if self.password.get() != self.confirmPassword.get():
 
-            PJ_Mobius_Dialog.Dialog("Error", "Password and Confirm Password do not match.").showDialog()
+            Dialog("Error", "Password and Confirm Password do not match.").showDialog()
             self.entry_confirmPassword.focus_set()
             return False
 
@@ -107,7 +107,7 @@ class AddUserForm(ttk.Frame):
 
         if not self.accessLevel.get():
 
-            PJ_Mobius_Dialog.Dialog("Error", "User access level must be selected.")
+            Dialog("Error", "User access level must be selected.").showDialog()
             self.combo_accessLevel.current(0)
             self.combo_accessLevel.focus_set()
             return False
@@ -116,7 +116,7 @@ class AddUserForm(ttk.Frame):
 
             if not self.company.get():
 
-                PJ_Mobius_Dialog.Dialog("Error", "Company must be selected for non-Super users.").showDialog()
+                Dialog("Error", "Company must be selected for non-Super users.").showDialog()
                 self.combo_company.current(0)
                 self.combo_company.focus_set()
                 return False
@@ -171,11 +171,11 @@ class AddUserForm(ttk.Frame):
 
         # Send request to server
 
-        responseDict = DataAccess.UserInfo().postUserInfo(requestPayload)
+        responseDict = UserInfo().postUserInfo(requestPayload)
         if responseDict is None:
 
             self.Logger.Error("Failed to add new user.")
-            PJ_Mobius_Dialog.Dialog("Error", "Failed to add new user. Please check the logs for details.").showDialog()
+            Dialog("Error", "Failed to add new user. Please check the logs for details.").showDialog()
             return
 
         elif responseDict.get("Created", False) is not True:
@@ -183,17 +183,17 @@ class AddUserForm(ttk.Frame):
             if responseDict.get("ErrorInfo", {}).get("Error", False):
 
                 errorMessage = responseDict.get("ErrorInfo").get("Message", "Unknown error.")
-                PJ_Mobius_Dialog.Dialog("Error", f"Failed to add new user.\n{errorMessage}").showDialog()
+                Dialog("Error", f"Failed to add new user.\n{errorMessage}").showDialog()
                 self.Logger.Error(f"Failed to add new user: {errorMessage}")
 
             else:
 
-                PJ_Mobius_Dialog.Dialog("Error", "Failed to add new user due to unknown error.").showDialog()
+                Dialog("Error", "Failed to add new user due to unknown error.").showDialog()
                 self.Logger.Error("Failed to add new user due to unknown error.")
 
             return
         
-        PJ_Mobius_Dialog.Dialog("Info", "New user added successfully.").showDialog()
+        Dialog("Info", "New user added successfully.").showDialog()
         self.Logger.Info(f"New user '{self.userName.get()}' added successfully.")
         self.clearForm()
 
@@ -230,7 +230,7 @@ class AddUserForm(ttk.Frame):
 
                 # Guests cannot add new user
 
-                PJ_Mobius_Dialog.Dialog("Error", "You do not have permission to add new user.").showDialog()
+                Dialog("Error", "You do not have permission to add new user.").showDialog()
                 self.Logger.Warn("Guest user attempted to add new user.")
                 self.destroy()
                 return
@@ -313,8 +313,8 @@ class AddUserForm(ttk.Frame):
                 # Get company list from database
 
                 companyList = []
-                company5List = DataAccess.CompanyInfo().getCompanyInfo(contractLevel=5)
-                company4List = DataAccess.CompanyInfo().getCompanyInfo(contractLevel=4)
+                company5List = CompanyInfo().getCompanyInfo(contractLevel=5)
+                company4List = CompanyInfo().getCompanyInfo(contractLevel=4)
 
                 if company5List is not None:
 
@@ -354,7 +354,7 @@ class AddUserForm(ttk.Frame):
         except Exception as e:
 
             self.Logger.ShowError(e, "Failed to generate Add User form.")
-            PJ_Mobius_Dialog.Dialog("Error", f"Failed to generate Add User form.\n{e}").showDialog()
+            Dialog("Error", f"Failed to generate Add User form.\n{e}").showDialog()
             self.destroy()
             return
         

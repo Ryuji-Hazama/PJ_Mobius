@@ -4,11 +4,11 @@ import threading
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-import DataAccess
-import PJ_Mobius_Company
-import PJ_Mobius_Dialog
-import PJ_Mobius_Login
-import PJ_Mobius_User
+from api import UserInfo, CompanyInfo
+from ui import Dialog, ProcessRequest
+from ui.company import AddCompanyForm
+from ui.user import AddUserForm
+from lib import Logout
 
 NONE_LIST = [None, "", "None"]
 
@@ -40,7 +40,7 @@ class MainMenuForm(ttk.Frame):
         except Exception as e:
 
             self.Logger.ShowError(e, "Failed to read configuration file.")
-            PJ_Mobius_Dialog.Dialog("Error", "Failed to read app configurations.").showDialog()
+            Dialog("Error", "Failed to read app configurations.").showDialog()
 
     def menuWindow(self, master):
 
@@ -54,13 +54,13 @@ class MainMenuForm(ttk.Frame):
         mb_UserManagement = ttk.Menubutton(left_f, text="User Management", width=20)
         menu = ttk.Menu(mb_UserManagement, tearoff=0)
         mb_UserManagement["menu"] = menu
-        menu.add_command(label="Add User", command=lambda: PJ_Mobius_User.AddUserForm(self.right_f))
+        menu.add_command(label="Add User", command=lambda: AddUserForm(self.right_f))
         mb_UserManagement.pack(pady=5)
 
         mb_CompanyManagement = ttk.Menubutton(left_f, text="Company Management", width=20)
         menu_company = ttk.Menu(mb_CompanyManagement, tearoff=0)
         mb_CompanyManagement["menu"] = menu_company
-        menu_company.add_command(label="Add Company", command=lambda: PJ_Mobius_Company.AddCompanyForm(self.right_f))
+        menu_company.add_command(label="Add Company", command=lambda: AddCompanyForm(self.right_f))
         mb_CompanyManagement.pack(pady=5)
 
         master.add(left_f)
@@ -70,7 +70,7 @@ class MainMenuForm(ttk.Frame):
         try:
 
             userId = int(os.getenv("PJ_MOBIUS_USER"))
-            userData = DataAccess.UserInfo().getUserInfo(userId=userId)
+            userData = UserInfo().getUserInfo(userId=userId)
             self.Logger.Info(f"User data: {userData}")  # Delete this line in production
 
             if userData is None or len(userData) != 1:
@@ -80,7 +80,7 @@ class MainMenuForm(ttk.Frame):
         except Exception as e:
 
             self.Logger.ShowError(e, "Failed to get user data from server.")
-            PJ_Mobius_Dialog.Dialog("Error", "Failed to get user data from server.").showDialog()
+            Dialog("Error", "Failed to get user data from server.").showDialog()
             userData = None
 
         self.right_f = ttk.Frame(master)
@@ -128,7 +128,7 @@ class MainMenuForm(ttk.Frame):
 
         if os.getenv("PJ_MOBIUS_COMPANY") not in NONE_LIST:
 
-            companyList = DataAccess.CompanyInfo().getCompanyInfo()
+            companyList = CompanyInfo().getCompanyInfo()
             self.Logger.Info(f"Company info: {companyList}")
 
             if companyList is not None and len(companyList) == 1:
@@ -214,8 +214,8 @@ class MainMenuForm(ttk.Frame):
         try:
 
             self.Logger.Info("Closing main menu window.")
-            processLogin = PJ_Mobius_Dialog.ProcessRequest("Logging out...")
-            t = threading.Thread(target=PJ_Mobius_Login.Logout(self.callback, self).logOut, args=(processLogin, quit))
+            processLogin = ProcessRequest("Logging out...")
+            t = threading.Thread(target=Logout(self.callback, self).logOut, args=(processLogin, quit))
             t.start()
 
         except Exception as e:

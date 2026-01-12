@@ -1,6 +1,6 @@
 import maplex
-import Session
-import TableAdapters
+from .Session import CheckSession
+from db import CompanyTableAdapters
 
 class CompanyManager:
 
@@ -12,8 +12,8 @@ class CompanyManager:
 
         # Table adapters
 
-        self.CompanyAdapter = TableAdapters.CompanyTableAdapters()
-        self.Session = Session.CheckSession(token)
+        self.CompanyAdapter = CompanyTableAdapters()
+        self.Session = CheckSession(token)
         self.sessionToken = token
 
     def close(self):
@@ -98,7 +98,7 @@ class CompanyManager:
 
             if not retDict["CompanyList"]:
 
-                retDict["ErrorInfo"]["Error"] = True
+                retDict["ErrorInfo"]["Error"] = False
                 retDict["ErrorInfo"]["Message"] = "No company found."
                 self.Logger.Info("No company found with the given criteria.")
 

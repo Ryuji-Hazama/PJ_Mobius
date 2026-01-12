@@ -1,6 +1,6 @@
 import maplex
 import os
-import TableAdapters
+from db import UserTableAdapters
 import Tools
 
 class InitSuperUser:
@@ -23,7 +23,7 @@ class InitSuperUser:
 
         # Table adapter
 
-        self.tableAdapter = TableAdapters.UserTableAdapters()
+        self.tableAdapter = UserTableAdapters()
 
     def checkPassword(self) -> bool:
 

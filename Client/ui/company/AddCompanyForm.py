@@ -3,8 +3,8 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 import os
 
-import DataAccess
-import PJ_Mobius_Dialog
+from api import CompanyInfo
+from ui import Dialog
 
 class AddCompanyForm(ttk.Frame):
 
@@ -55,7 +55,7 @@ class AddCompanyForm(ttk.Frame):
 
         if self.userAccessLevel == "Guest":
 
-            PJ_Mobius_Dialog.Dialog("Error", "Guest users are not allowed to add companies.").showDialog()
+            Dialog("Error", "Guest users are not allowed to add companies.").showDialog()
             self.logger.Warn("Guest user attempted to access Add Company form.")
             self.destroy()
             return
@@ -118,22 +118,22 @@ class AddCompanyForm(ttk.Frame):
 
         # Send the request to the server
 
-        response = DataAccess.CompanyInfo.postCompanyInfo(requestDict)
+        response = CompanyInfo().postCompanyInfo(requestDict)
 
         if response is None:
 
             self.logger.Error("Failed to receive a response from the server.")
-            PJ_Mobius_Dialog.showErrorDialog(self.parent, "Error", "No response from server.")
+            Dialog("Error", "No response from server.").showDialog()
             return
 
         elif response.get("Success", False) is False:
 
             errorMessage = response.get("ErrorInfo", {}).get("Message", "Unknown error.")
             self.logger.Error(f"Failed to add company: {errorMessage}")
-            PJ_Mobius_Dialog.showErrorDialog(self.parent, "Error", f"Failed to add company: {errorMessage}")
+            Dialog("Error", f"Failed to add company: {errorMessage}").showDialog()
             return
 
-        PJ_Mobius_Dialog.showInfoDialog(self.parent, "Info", "Company added successfully.")
+        Dialog("Info", "Company added successfully.").showDialog()
         self.logger.Info("Company added successfully.")
         self.clearFields()
 
