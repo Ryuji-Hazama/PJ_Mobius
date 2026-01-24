@@ -12,7 +12,7 @@ class AddCompanyForm(ttk.Frame):
 
         # Logging object
 
-        self.logger = maplex.Logger("AddCompanyForm")
+        self.logger = maplex.Logger(__name__)
 
         # Initialize the AddCompanyForm UI
 
@@ -31,7 +31,7 @@ class AddCompanyForm(ttk.Frame):
 
         self.buildUI()
         self.generateButtons()
-        self.logger.Info("Add Company form UI built.")
+        self.logger.info("Add Company form UI built.")
 
     def destroyChildren(self, master: ttk.Frame):
 
@@ -56,7 +56,7 @@ class AddCompanyForm(ttk.Frame):
         if self.userAccessLevel == "Guest":
 
             Dialog("Error", "Guest users are not allowed to add companies.").showDialog()
-            self.logger.Warn("Guest user attempted to access Add Company form.")
+            self.logger.warn("Guest user attempted to access Add Company form.")
             self.destroy()
             return
 
@@ -122,19 +122,19 @@ class AddCompanyForm(ttk.Frame):
 
         if response is None:
 
-            self.logger.Error("Failed to receive a response from the server.")
+            self.logger.error("Failed to receive a response from the server.")
             Dialog("Error", "No response from server.").showDialog()
             return
 
         elif response.get("Success", False) is False:
 
             errorMessage = response.get("ErrorInfo", {}).get("Message", "Unknown error.")
-            self.logger.Error(f"Failed to add company: {errorMessage}")
+            self.logger.error(f"Failed to add company: {errorMessage}")
             Dialog("Error", f"Failed to add company: {errorMessage}").showDialog()
             return
 
         Dialog("Info", "Company added successfully.").showDialog()
-        self.logger.Info("Company added successfully.")
+        self.logger.info("Company added successfully.")
         self.clearFields()
 
 

@@ -18,7 +18,7 @@ class CompanyInfo:
 
         # Logging objects
 
-        self.Logger = maplex.Logger("DataAccess.CompanyInfo")
+        self.logger = maplex.Logger(__name__)
 
         # variables
 
@@ -40,7 +40,7 @@ class CompanyInfo:
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to read configuration file.")
+            self.logger.ShowError(e, "Failed to read configuration file.")
             raise
 
         # Process window
@@ -59,13 +59,13 @@ class CompanyInfo:
 
             if not SessionInfo().checkSession():
 
-                self.Logger.Warn("Session is invalid or expired.")
+                self.logger.warn("Session is invalid or expired.")
                 Dialog("Warn", "Your session has expired. Please log in again.", "Session Expired").showDialog()
                 return None
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to validate session.")
+            self.logger.ShowError(e, "Failed to validate session.")
             Dialog("Error", "Failed to validate session. Please log in again.").showDialog()
             return None
 
@@ -104,21 +104,21 @@ class CompanyInfo:
 
                     if response.status_code != 200:
 
-                        self.Logger.Error(f"Failed to post company info. Status code: {response.status_code}")
+                        self.logger.error(f"Failed to post company info. Status code: {response.status_code}")
                         retDict = None
                         return
 
                     retDict = response.json()
-                    self.Logger.Debug(f"Post company info response: {retDict}")
+                    self.logger.debug(f"Post company info response: {retDict}")
 
                     if retDict.get("ErrorInfo", {}).get("Error", False):
 
-                        self.Logger.Error(f"Error in post company info response: {retDict.get('ErrorInfo', {}).get('Message', '')}")
+                        self.logger.error(f"Error in post company info response: {retDict.get('ErrorInfo', {}).get('Message', '')}")
                         return
 
                 except Exception as e:
 
-                    self.Logger.ShowError(e, "Failed to post company info to server.")
+                    self.logger.ShowError(e, "Failed to post company info to server.")
                     retDict = None
 
             self.processWindow = ProcessRequest("Posting company info to server...")
@@ -131,7 +131,7 @@ class CompanyInfo:
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to post company info to server.")
+            self.logger.ShowError(e, "Failed to post company info to server.")
             return None
         
         finally:
@@ -153,13 +153,13 @@ class CompanyInfo:
 
             if not SessionInfo().checkSession():
 
-                self.Logger.Warn("Session is invalid or expired.")
+                self.logger.warn("Session is invalid or expired.")
                 Dialog("Warn", "Your session has expired. Please log in again.", "Session Expired").showDialog()
                 return None
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to validate session.")
+            self.logger.ShowError(e, "Failed to validate session.")
             Dialog("Error", "Failed to validate session. Please log in again.").showDialog()
             return None
 
@@ -171,7 +171,7 @@ class CompanyInfo:
 
         if companyID is None and companyName is None and contractLevel is None:
 
-            self.Logger.Warn("No parameters provided for getCompanyInfo.")
+            self.logger.warn("No parameters provided for getCompanyInfo.")
             Dialog("Error", "No parameters provided for getCompanyInfo.").showDialog()
             return None
 
@@ -214,28 +214,28 @@ class CompanyInfo:
 
                     if response.status_code != 200:
 
-                        self.Logger.Error(f"Failed to get company info. Status code: {response.status_code}")
+                        self.logger.error(f"Failed to get company info. Status code: {response.status_code}")
                         retDict = None
                         return
 
                     retDict = response.json()
-                    self.Logger.Debug(f"Get company info response: {retDict}")
+                    self.logger.debug(f"Get company info response: {retDict}")
 
                     if retDict.get("ErrorInfo", {}).get("Error", False):
 
-                        self.Logger.Error(f"Error in get company info response: {retDict.get('ErrorInfo', {}).get('Message', '')}")
+                        self.logger.error(f"Error in get company info response: {retDict.get('ErrorInfo', {}).get('Message', '')}")
                         retDict = None
                         return
 
                     elif len(retDict.get("Companies", [])) == 0:
 
-                        self.Logger.Warn(f"No company found: {retDict.get('ErrorInfo', {}).get('Message', 'Unknown reason')}")
+                        self.logger.warn(f"No company found: {retDict.get('ErrorInfo', {}).get('Message', 'Unknown reason')}")
                         retDict = None
                         return
 
                 except Exception as e:
 
-                    self.Logger.ShowError(e, "Failed to get company info from server.")
+                    self.logger.ShowError(e, "Failed to get company info from server.")
                     retDict = None
 
             self.processWindow = ProcessRequest("Getting company info from server...")
@@ -255,7 +255,7 @@ class CompanyInfo:
             
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to get company info from server.")
+            self.logger.ShowError(e, "Failed to get company info from server.")
             return None
 
         finally:

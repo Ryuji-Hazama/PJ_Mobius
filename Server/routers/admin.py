@@ -10,7 +10,7 @@ from fastapi import APIRouter
 import BaseModelData as BMD
 import initSuperUser
 
-Logger = maplex.Logger("AdminRouter")
+logger = maplex.Logger(__name__)
 
 router = APIRouter(prefix="/api/v1", tags=["admin"])
 
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/api/v1", tags=["admin"])
 @router.post("/initsuper", response_model=BMD.InitSuperResponse)
 def initSuperReceived(item: BMD.InitSuperUserItem):
 
-    Logger.Info("Init super user request received.")
+    logger.info("Init super user request received.")
 
     passWd = item.Password
     superUserName = item.SuperUserName
@@ -34,7 +34,7 @@ def initSuperReceived(item: BMD.InitSuperUserItem):
 
         resultItem.ErrorInfo.Error = True
         resultItem.ErrorInfo.Message = "Invalid request."
-        Logger.Error(f"Invalid request item.")
+        logger.error(f"Invalid request item.")
         return resultItem
     
     try:
@@ -43,7 +43,7 @@ def initSuperReceived(item: BMD.InitSuperUserItem):
 
     except Exception as e:
 
-        Logger.ShowError(e, "Exception occurred while registering the super user.")
+        logger.ShowError(e, "Exception occurred while registering the super user.")
         resultItem.ErrorInfo.Error = True
         resultItem.ErrorInfo.Message = f"{e}"
 

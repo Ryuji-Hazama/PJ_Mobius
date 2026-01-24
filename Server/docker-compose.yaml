@@ -1,6 +1,6 @@
 networks:
   my-network:
-    external: true
+    driver: bridge
 
 services:
   pj-mobius-server:

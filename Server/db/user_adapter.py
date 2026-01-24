@@ -18,17 +18,17 @@ class UserTableAdapters:
 
         # Logging objects
 
-        self.Logger = maplex.Logger("TableAdapters: Users")
+        self.logger = maplex.Logger(__name__)
 
         try:
 
             self.connection = DbConnection().connect()
             self.cursor = self.connection.cursor()
-            self.Logger.Info("Database connection established.")
+            self.logger.info("Database connection established.")
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to connect database.")
+            self.logger.ShowError(e, "Failed to connect database.")
             raise
 
     def closeConnection(self):
@@ -37,11 +37,11 @@ class UserTableAdapters:
 
             self.cursor.close()
             self.connection.close()
-            self.Logger.Info("Database connection closed.")
+            self.logger.info("Database connection closed.")
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to close database connection.")
+            self.logger.ShowError(e, "Failed to close database connection.")
             raise
 
     #######################################
@@ -62,13 +62,13 @@ class UserTableAdapters:
                 f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);"
             self.cursor.execute(sql, (userName, eMail, hashedPassword, initialPassword, accessLevel, companyId, userStatus, createUserId, createUserId))
             self.connection.commit()
-            self.Logger.Info("New user info created.")
+            self.logger.info("New user info created.")
 
             return True
         
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to insert new user information.")
+            self.logger.ShowError(e, "Failed to insert new user information.")
             raise
 
     ##########################################
@@ -83,11 +83,11 @@ class UserTableAdapters:
             sql = f"UPDATE Users SET password_hash=%s, initial_password=0, updated_user_id=%s, updated_at=CURRENT_TIMESTAMP WHERE user_id=%s;"
             self.cursor.execute(sql, (newPassword, updateUserId, userId))
             self.connection.commit()
-            self.Logger.Info("User password updated.")
+            self.logger.info("User password updated.")
 
         except Exception as e:
             
-            self.Logger.ShowError(e, "Failed to update user password.")
+            self.logger.ShowError(e, "Failed to update user password.")
             raise
 
     def updateLoginFailed(self, userId: int, failedCount: int, failedAt: datetime.datetime | None = None, userStatus: Literal['active', 'inactive', 'suspended'] = 'active'):
@@ -99,11 +99,11 @@ class UserTableAdapters:
             sql = f"UPDATE Users SET login_failed=%s, login_failed_at=%s, user_status=%s WHERE user_id=%s;"
             self.cursor.execute(sql, (failedCount, failedAt, userStatus, userId))
             self.connection.commit()
-            self.Logger.Info("User login failed info updated.")
+            self.logger.info("User login failed info updated.")
 
         except Exception as e:
             
-            self.Logger.ShowError(e, "Failed to update user login failed info.")
+            self.logger.ShowError(e, "Failed to update user login failed info.")
             raise
 
     ##########################################
@@ -115,7 +115,7 @@ class UserTableAdapters:
 
             # If the parameters are all empty
 
-            self.Logger.Warn("Selecting all Users at once is not allowed.")
+            self.logger.warn("Selecting all Users at once is not allowed.")
             return None
 
         try:
@@ -191,5 +191,5 @@ class UserTableAdapters:
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to select user informantions.")
+            self.logger.ShowError(e, "Failed to select user informantions.")
             raise

@@ -2,13 +2,10 @@ Server/certifications/
 Server/DB_init/demo_*
 Server/secrets/
 
-Client/logs/
 Client/certifications/
 Client/InitialSuperSignUp/*.crt
 Client/InitialSuperSignUp/*.key
-Client/InitialSuperSignUp/logs/
-Client/InitialSuperSignUp/__pycache__/
 
-*/__pycache__/
-*/logs/
-*/.dist/
+__pycache__
+logs
+.dist

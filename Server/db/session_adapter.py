@@ -17,17 +17,17 @@ class SessionInfoTableAdapters:
 
         # Logging objects
 
-        self.Logger = maplex.Logger(f"TableAdapters: Session")
+        self.logger = maplex.Logger(__name__)
 
         try:
 
             self.connection = DbConnection().connect()
             self.cursor = self.connection.cursor()
-            self.Logger.Info("Database connection established.")
+            self.logger.info("Database connection established.")
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to connect database.")
+            self.logger.ShowError(e, "Failed to connect database.")
             raise
 
     def closeConnection(self):
@@ -36,11 +36,11 @@ class SessionInfoTableAdapters:
 
             self.cursor.close()
             self.connection.close()
-            self.Logger.Info("Database connection closed.")
+            self.logger.info("Database connection closed.")
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to close database connection.")
+            self.logger.ShowError(e, "Failed to close database connection.")
             raise
 
     #################################
@@ -48,7 +48,7 @@ class SessionInfoTableAdapters:
 
     def CreateNewSession(self, userData: tuple) -> str:
 
-        self.Logger.Info("Creating new session information.")
+        self.logger.info("Creating new session information.")
         selectSql = f"SELECT session_uuid FROM SessionInfo WHERE user_id=%s AND logout_datetime>%s;"
         self.cursor.execute(selectSql, (userData[0], f"{datetime.datetime.now():%Y/%m/%d %H:%M:%S}"))
         result = self.cursor.fetchall()
@@ -57,7 +57,7 @@ class SessionInfoTableAdapters:
 
             # Session from another computer is still remains
 
-            self.Logger.Warn("There is another active session.")
+            self.logger.warn("There is another active session.")
             return None
         
         # Create session info
@@ -65,7 +65,7 @@ class SessionInfoTableAdapters:
         sql = f"INSERT INTO SessionInfo (user_id, user_name, company_id, access_level) VALUES (%s, %s, %s, %s);"
         self.cursor.execute(sql, (userData[0], userData[1], userData[6], userData[5]))
         self.connection.commit()
-        self.Logger.Info("Session info created.")
+        self.logger.info("Session info created.")
         
         # Recheck duplicate session
 
@@ -76,7 +76,7 @@ class SessionInfoTableAdapters:
 
             # Login with two computers at the same time!?
 
-            self.Logger.Warn("Another computer took the session.")
+            self.logger.warn("Another computer took the session.")
             return None
 
         return result[0][0]
@@ -86,20 +86,20 @@ class SessionInfoTableAdapters:
 
     def UpdateLogout(self, uuid: str, update: str):
 
-        self.Logger.Info(f"Updating logout datetime: +{update}")
+        self.logger.info(f"Updating logout datetime: +{update}")
 
         sql = f"UPDATE SessionInfo SET logout_datetime=ADDTIME(CURRENT_TIMESTAMP, %s) WHERE session_uuid=%s;"
         self.cursor.execute(sql, (update, uuid))
         self.connection.commit()
 
-        self.Logger.Info("Logout datetime updated.")
+        self.logger.info("Logout datetime updated.")
 
     ################################
     # Select
 
     def selectSessionInfo(self, uuid: str) -> tuple[tuple] | None:
 
-        self.Logger.Info(f"Selecting session information: {uuid}")
+        self.logger.info(f"Selecting session information: {uuid}")
 
         try:
 
@@ -111,7 +111,7 @@ class SessionInfoTableAdapters:
         
         except Exception as e:
 
-            self.Logger.ShowError(e, f"Failed to select session information: {uuid}")
+            self.logger.ShowError(e, f"Failed to select session information: {uuid}")
             raise
 
     def selectSessionInfoByTimeAndUser(self, userId: int, BeforeAfter: Literal['before', 'after'], logoutDatetime: datetime.datetime | None = None) -> tuple[tuple] | None:
@@ -123,7 +123,7 @@ class SessionInfoTableAdapters:
         logoutDatetimeString = f"{logoutDatetime:%Y/%m/%d %H:%M:%S}"
         timeSpan = f"{'<' if BeforeAfter == 'before' else '>'}"
 
-        self.Logger.Info(f"Selecting session information by time and user: {userId}, {BeforeAfter}, {logoutDatetime:%Y/%m/%d %H:%M:%S}")
+        self.logger.info(f"Selecting session information by time and user: {userId}, {BeforeAfter}, {logoutDatetime:%Y/%m/%d %H:%M:%S}")
 
         try:
 
@@ -135,5 +135,5 @@ class SessionInfoTableAdapters:
         
         except Exception as e:
 
-            self.Logger.ShowError(e, f"Failed to select session information by time and user: {userId}, {BeforeAfter}, {timeSpan}")
+            self.logger.ShowError(e, f"Failed to select session information by time and user: {userId}, {BeforeAfter}, {timeSpan}")
             raise

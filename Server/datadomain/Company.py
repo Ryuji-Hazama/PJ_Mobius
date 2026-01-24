@@ -8,7 +8,7 @@ class CompanyManager:
 
         # Logging objects
 
-        self.Logger = maplex.Logger("CompanyManager")
+        self.logger = maplex.Logger(__name__)
 
         # Table adapters
 
@@ -20,7 +20,7 @@ class CompanyManager:
 
         self.CompanyAdapter.closeConnection()
         self.Session.close()
-        self.Logger.Info("Closed CompanyManager object.")
+        self.logger.info("Closed CompanyManager object.")
 
     def createCompany(self, companyName: str | None = None, contractLevel: int | None = None, companyPhone: str | None = None, companyZipCode: str | None = None, companyAddress: str | None = None, companyEmail: str | None = None) -> dict:
 
@@ -42,7 +42,7 @@ class CompanyManager:
 
                 retDict["ErrorInfo"]["Error"] = True
                 retDict["ErrorInfo"]["Message"] = "Company name and contract level are required."
-                self.Logger.Info("Company name and contract level are required to create a company.")
+                self.logger.info("Company name and contract level are required to create a company.")
                 return retDict
 
             # Check for existing company with the same name
@@ -53,7 +53,7 @@ class CompanyManager:
 
                 retDict["ErrorInfo"]["Error"] = True
                 retDict["ErrorInfo"]["Message"] = f"Company named {companyName} already exists."
-                self.Logger.Info(f"Company named {companyName} already exists.")
+                self.logger.info(f"Company named {companyName} already exists.")
                 return retDict
 
             # Insert the new company
@@ -64,15 +64,15 @@ class CompanyManager:
 
                 retDict["ErrorInfo"]["Error"] = True
                 retDict["ErrorInfo"]["Message"] = "Failed to create company."
-                self.Logger.Info("Failed to create a new company.")
+                self.logger.info("Failed to create a new company.")
 
             else:
 
-                self.Logger.Info(f"Created new company with ID: {retDict['CompanyID']}")
+                self.logger.info(f"Created new company with ID: {retDict['CompanyID']}")
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to create company.")
+            self.logger.ShowError(e, "Failed to create company.")
             retDict["ErrorInfo"]["Error"] = True
             retDict["ErrorInfo"]["Message"] = f"Failed to create company: {str(e)}"
 
@@ -100,15 +100,15 @@ class CompanyManager:
 
                 retDict["ErrorInfo"]["Error"] = False
                 retDict["ErrorInfo"]["Message"] = "No company found."
-                self.Logger.Info("No company found with the given criteria.")
+                self.logger.info("No company found with the given criteria.")
 
             else:
 
-                self.Logger.Debug(f"Found {len(retDict['CompanyList'])} companies with the given criteria.")
+                self.logger.debug(f"Found {len(retDict['CompanyList'])} companies with the given criteria.")
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to get company list.")
+            self.logger.ShowError(e, "Failed to get company list.")
             retDict["ErrorInfo"]["Error"] = True
             retDict["ErrorInfo"]["Message"] = f"Failed to get company list: {str(e)}"
 

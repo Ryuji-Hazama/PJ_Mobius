@@ -13,7 +13,7 @@ class InitPasswordForm(ttk.Frame):
 
         # Logging objects
 
-        self.Logger = maplex.Logger("InitPassword")
+        self.logger = maplex.Logger(__name__)
 
         # Variables
 
@@ -76,13 +76,13 @@ class InitPasswordForm(ttk.Frame):
 
     def handleResponse(self, response: requests.Response):
 
-        self.Logger.Info(f"Response received: {response.status_code}")
+        self.logger.info(f"Response received: {response.status_code}")
 
         try:
 
             if response.status_code != 200:
 
-                self.Logger.Error(f"Request failed with status code: {response.status_code}")
+                self.logger.error(f"Request failed with status code: {response.status_code}")
                 Dialog("Warn", f"Request failed with status code: {response.status_code}\n\n"
                                         "Please try again later and contact to support if the problem will not solve.")\
                                             .showDialog()
@@ -92,7 +92,7 @@ class InitPasswordForm(ttk.Frame):
 
             if responseJson["ErrorInfo"]["Error"]:
 
-                self.Logger.Error(f"Error occurred while updating password: {responseJson["ErrorInfo"]["Message"]}")
+                self.logger.error(f"Error occurred while updating password: {responseJson["ErrorInfo"]["Message"]}")
                 Dialog("Warn", f"Failed to update password because of the following error:\n"
                                         f"{responseJson["ErrorInfo"]["Message"]}\n\n"
                                         "Please contact to the support and try later.").showDialog()
@@ -102,7 +102,7 @@ class InitPasswordForm(ttk.Frame):
             
             if not responseJson["Update"]:
 
-                self.Logger.Info(f"Failed to update password: {responseJson["Message"]}")
+                self.logger.info(f"Failed to update password: {responseJson["Message"]}")
                 Dialog("Info", f"Failed to update password:\n{responseJson["Message"]}")\
                     .showDialog()
                 self.passEnt.focus_set()
@@ -110,13 +110,13 @@ class InitPasswordForm(ttk.Frame):
                 return
 
             Dialog("Info", "Password updated successfully.").showDialog()
-            self.Logger.Info("Password updated successfully.")
+            self.logger.info("Password updated successfully.")
             self.master.destroy()
             self.success = True
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to handle response.")
+            self.logger.ShowError(e, "Failed to handle response.")
             Dialog("Error", f"Unexpected error:\n"
                                       f"{e}\n\n"
                                       f"Please contact to support.").showDialog()
@@ -142,7 +142,7 @@ class InitPasswordForm(ttk.Frame):
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to read configurations.")
+            self.logger.ShowError(e, "Failed to read configurations.")
             self.master.destroy()
             return False
         
@@ -167,7 +167,7 @@ class InitPasswordForm(ttk.Frame):
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to request update user password.")
+            self.logger.ShowError(e, "Failed to request update user password.")
             Dialog("Error", f"Request failed:\n{e}").showDialog()
             return False
         
@@ -181,7 +181,7 @@ class InitPasswordForm(ttk.Frame):
 
         if self.Password.get() in {None, ""} or self.PassConf.get() in {None, ""}:
 
-            self.Logger.Warn("One of the entry is empty.")
+            self.logger.warn("One of the entry is empty.")
             Dialog("Warn", "One of the entry is empty!").showDialog()
             self.passEnt.focus_set()
             self.passEnt.select_range(0, END)
@@ -189,7 +189,7 @@ class InitPasswordForm(ttk.Frame):
         
         if self.Password.get() != self.PassConf.get():
 
-            self.Logger.Warn("Password does not match.")
+            self.logger.warn("Password does not match.")
             Dialog("Warn", "Password does not match!").showDialog()
             self.passEnt.focus_set()
             self.passEnt.select_range(0, END)
@@ -224,7 +224,7 @@ class InitPasswordForm(ttk.Frame):
         self.generateButtons()
 
         self.master.protocol("WM_DELETE_WINDOW", lambda: self.cancelButtonClicked())
-        self.Logger.Info("Password initialization window loaded.")
+        self.logger.info("Password initialization window loaded.")
 
         # Wait till end
 

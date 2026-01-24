@@ -10,7 +10,7 @@ from fastapi import APIRouter
 import BaseModelData as BMD
 from datadomain import CompanyManager
 
-Logger = maplex.Logger("CompaniesRouter")
+logger = maplex.Logger(__name__)
 
 router = APIRouter(prefix="/api/v1", tags=["companies"])
 
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/api/v1", tags=["companies"])
 @router.post("/company", response_model=BMD.PostCompanyResponse)
 def postCompanyInfo(item: BMD.PostCompanyRequestItem):
 
-    Logger.Info(f"Post company info request received: {item.model_dump()}")
+    logger.info(f"Post company info request received: {item.model_dump()}")
     retItem = BMD.PostCompanyResponse()
 
     try:
@@ -35,7 +35,7 @@ def postCompanyInfo(item: BMD.PostCompanyRequestItem):
 
     except Exception as e:
 
-        Logger.ShowError(e, "Failed to post company information.")
+        logger.ShowError(e, "Failed to post company information.")
         retItem.ErrorInfo.Error = True
         retItem.ErrorInfo.Message = f"{e}"
 
@@ -51,7 +51,7 @@ def postCompanyInfo(item: BMD.PostCompanyRequestItem):
 @router.get("/company", response_model=BMD.GetCompanyInfoResponse)
 def getCompanyInfo(item: BMD.GetCompanyInfoRequestItem):
 
-    Logger.Info(f"Get company info request received: {item.model_dump()}")
+    logger.info(f"Get company info request received: {item.model_dump()}")
     retItem = BMD.GetCompanyInfoResponse()
 
     try:
@@ -78,7 +78,7 @@ def getCompanyInfo(item: BMD.GetCompanyInfoRequestItem):
 
     except Exception as e:
 
-        Logger.ShowError(e, "Failed to get company information.")
+        logger.ShowError(e, "Failed to get company information.")
         retItem.ErrorInfo.Error = True
         retItem.ErrorInfo.Message = f"{e}"
 

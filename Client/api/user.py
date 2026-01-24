@@ -19,7 +19,7 @@ class UserInfo:
 
         # Logging objects
 
-        self.Logger = maplex.Logger("DataAccess.UserInfo")
+        self.logger = maplex.Logger(__name__)
 
         # variables
 
@@ -33,7 +33,7 @@ class UserInfo:
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to read configuration file.")
+            self.logger.ShowError(e, "Failed to read configuration file.")
             raise
 
         # Process window
@@ -52,12 +52,12 @@ class UserInfo:
 
             # Check user duplication before posting
 
-            self.Logger.Info("Checking for existing user before posting new user info.")
+            self.logger.info("Checking for existing user before posting new user info.")
             existingUser = self.getUserInfo(userName=userData.get("UserName"))
 
             if existingUser is not None and len(existingUser) > 0:
 
-                self.Logger.Warn(f"User '{userData.get('UserName')}' already exists.")
+                self.logger.warn(f"User '{userData.get('UserName')}' already exists.")
                 Dialog("Error", f"User '{userData.get('UserName')}' already exists. Please choose a different user name.").showDialog()
                 return retDict
             
@@ -65,11 +65,11 @@ class UserInfo:
 
             if existingUser is not None and len(existingUser) > 0:
 
-                self.Logger.Warn(f"E-Mail '{userData.get('Email')}' is already registered.")
+                self.logger.warn(f"E-Mail '{userData.get('Email')}' is already registered.")
                 Dialog("Error", f"E-Mail '{userData.get('Email')}' is already registered. Please use a different E-Mail address.").showDialog()
                 return retDict
             
-            self.Logger.Info("No existing user found. Proceeding to post new user info.")
+            self.logger.info("No existing user found. Proceeding to post new user info.")
 
             def worker():
 
@@ -102,21 +102,21 @@ class UserInfo:
 
                     if response.status_code != 200:
 
-                        self.Logger.Error(f"Failed to post user info. Status code: {response.status_code}")
+                        self.logger.error(f"Failed to post user info. Status code: {response.status_code}")
                         retDict = None
                         return
 
                     retDict = response.json()
-                    self.Logger.Debug(f"Post user info response: {retDict}")
+                    self.logger.debug(f"Post user info response: {retDict}")
 
                     if retDict.get("ErrorInfo", {}).get("Error", False):
 
-                        self.Logger.Error(f"Error in post user info response: {retDict.get('ErrorInfo', {}).get('Message', '')}")
+                        self.logger.error(f"Error in post user info response: {retDict.get('ErrorInfo', {}).get('Message', '')}")
                         return
 
                 except Exception as e:
 
-                    self.Logger.ShowError(e, "Failed to post user info to server.")
+                    self.logger.ShowError(e, "Failed to post user info to server.")
                     retDict = None
 
             self.processWindow = ProcessRequest("Posting user info to server...")
@@ -129,7 +129,7 @@ class UserInfo:
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to post user info to server.")
+            self.logger.ShowError(e, "Failed to post user info to server.")
             return None
         
         finally:
@@ -151,19 +151,19 @@ class UserInfo:
 
             if not SessionInfo().checkSession():
 
-                self.Logger.Warn("Session is invalid or expired.")
+                self.logger.warn("Session is invalid or expired.")
                 Dialog("Warn", "Your session has expired. Please log in again.", "Session Expired").showDialog()
                 return None
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to validate session.")
+            self.logger.ShowError(e, "Failed to validate session.")
             Dialog("Error", "Failed to validate session. Please log in again.").showDialog()
             return None
 
         if userId is None and userName is None and eMail is None and accessLevel is None and companyID is None and userStatus is None and active is None:
 
-            self.Logger.Warn("No parameters provided for getUserInfo.")
+            self.logger.warn("No parameters provided for getUserInfo.")
             Dialog("Error", "No parameters provided for getUserInfo.").showDialog()
             return None
 
@@ -210,22 +210,22 @@ class UserInfo:
 
                     if response.status_code != 200:
 
-                        self.Logger.Error(f"Failed to get user info. Status code: {response.status_code}")
+                        self.logger.error(f"Failed to get user info. Status code: {response.status_code}")
                         retDict = None
                         return
 
                     retDict = response.json()
-                    self.Logger.Debug(f"Get user info response: {retDict}")
+                    self.logger.debug(f"Get user info response: {retDict}")
 
                     if retDict.get("ErrorInfo", {}).get("Error", False):
 
-                        self.Logger.Error(f"Error in get user info response: {retDict.get('ErrorInfo', {}).get('Message', '')}")
+                        self.logger.error(f"Error in get user info response: {retDict.get('ErrorInfo', {}).get('Message', '')}")
                         retDict = None
                         return
 
                 except Exception as e:
 
-                    self.Logger.ShowError(e, "Failed to get user info from server.")
+                    self.logger.ShowError(e, "Failed to get user info from server.")
                     retDict = None
 
             self.processWindow = ProcessRequest("Getting user info from server...")
@@ -245,7 +245,7 @@ class UserInfo:
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to get user info from server.")
+            self.logger.ShowError(e, "Failed to get user info from server.")
             return None
         
         finally:

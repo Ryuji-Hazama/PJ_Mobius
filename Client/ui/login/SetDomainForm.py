@@ -15,7 +15,7 @@ class SetDomainForm(ttk.Frame):
 
         # Logging objects
 
-        self.Logger = maplex.Logger("SetDomainForm")
+        self.logger = maplex.Logger(__name__)
 
         # Config instance
 
@@ -25,12 +25,12 @@ class SetDomainForm(ttk.Frame):
 
         except maplex.MapleFileNotFoundException as notFoundE:
 
-            self.Logger.ShowError(notFoundE, "config.mpl does not exists.")
+            self.logger.ShowError(notFoundE, "config.mpl does not exists.")
             Dialog("Error", "Configuration file does not exists.").showDialog()
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to read config.mpl")
+            self.logger.ShowError(e, "Failed to read config.mpl")
             Dialog("Error", "Failed to read config.mpl\n"
                                       "Please recover configuration file or\n"
                                       "contact to support.").showDialog()
@@ -50,7 +50,7 @@ class SetDomainForm(ttk.Frame):
         self.domainEntry(self.domainText)
         self.buttons()
 
-        self.Logger.Info("Domain initialization form loaded.")
+        self.logger.info("Domain initialization form loaded.")
 
     def domainEntry(self, variable):
 
@@ -86,7 +86,7 @@ class SetDomainForm(ttk.Frame):
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Unexpected error occurred dualing generating entry form.")
+            self.logger.ShowError(e, "Unexpected error occurred dualing generating entry form.")
             Dialog("Error", f"Unexpected error:\n"
                                       f"{e}\n\n"
                                       f"Please contact to support.").showDialog()
@@ -128,7 +128,7 @@ class SetDomainForm(ttk.Frame):
 
         if domainText == "":
 
-            self.Logger.Warn("Domain text is empty.")
+            self.logger.warn("Domain text is empty.")
             Dialog("Info", "Entry is empty").showDialog()
 
         else:
@@ -136,5 +136,5 @@ class SetDomainForm(ttk.Frame):
             # Update config.mpl
 
             self.conf.saveValue("DOMAIN", domainText, "APPLICATION_SETTINGS", "HTTP_REQUEST", save=True)
-            self.Logger.Info(f"Domain information saved: {domainText}")
+            self.logger.info(f"Domain information saved: {domainText}")
             self.master.destroy()

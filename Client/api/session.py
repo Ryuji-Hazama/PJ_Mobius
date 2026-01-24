@@ -19,7 +19,7 @@ class SessionInfo:
         
         # Logging objects
 
-        self.Logger = maplex.Logger("DataAccess.SessionInfo")
+        self.logger = maplex.Logger(__name__)
 
         # variables
 
@@ -33,7 +33,7 @@ class SessionInfo:
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to read configuration file.")
+            self.logger.ShowError(e, "Failed to read configuration file.")
             raise
 
         # Process window
@@ -84,22 +84,22 @@ class SessionInfo:
 
                     if response.status_code != 200:
 
-                        self.Logger.Error(f"Failed to get session info. Status code: {response.status_code}")
+                        self.logger.error(f"Failed to get session info. Status code: {response.status_code}")
                         retDict = None
                         return
 
                     retDict = response.json()
-                    self.Logger.Debug(f"Get session info response: {retDict}")
+                    self.logger.debug(f"Get session info response: {retDict}")
 
                     if retDict.get("ErrorInfo", {}).get("Error", False):
 
-                        self.Logger.Error(f"Error in get session info response: {retDict.get('ErrorInfo', {}).get('Message', '')}")
+                        self.logger.error(f"Error in get session info response: {retDict.get('ErrorInfo', {}).get('Message', '')}")
                         retDict = None
                         return
 
                 except Exception as e:
 
-                    self.Logger.ShowError(e, "Failed to get session info from server.")
+                    self.logger.ShowError(e, "Failed to get session info from server.")
                     retDict = None
 
             self.processWindow = Dialog.ProcessRequest("Getting session info from server...")
@@ -112,7 +112,7 @@ class SessionInfo:
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to get session info from server.")
+            self.logger.ShowError(e, "Failed to get session info from server.")
             return None
         
         finally:
@@ -144,7 +144,7 @@ class SessionInfo:
 
             sessionTimeout = sessionTimeout.replace(tzinfo=datetime.timezone.utc)
             now = datetime.datetime.now(datetime.timezone.utc)
-            self.Logger.Debug(f"Current time: {now}, Session timeout(UTC): {sessionTimeout}")
+            self.logger.debug(f"Current time: {now}, Session timeout(UTC): {sessionTimeout}")
 
             # If current UTC time is before the timeout, session is still valid
 
@@ -172,7 +172,7 @@ class SessionInfo:
 
             logoutTime = datetime.datetime.strptime(logoutTimeStr, "%Y-%m-%dT%H:%M:%S")
             logoutTime = logoutTime.replace(tzinfo=datetime.timezone.utc)
-            self.Logger.Debug(f"Current time: {now}, Logout time(UTC): {logoutTime}")
+            self.logger.debug(f"Current time: {now}, Logout time(UTC): {logoutTime}")
             # If now is before logoutTime, session is valid. Update local stored
             # logout time and return True. Otherwise session is invalid.
 
@@ -184,5 +184,5 @@ class SessionInfo:
         
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to check session validity.")
+            self.logger.ShowError(e, "Failed to check session validity.")
             return False

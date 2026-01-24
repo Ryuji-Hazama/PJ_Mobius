@@ -10,7 +10,7 @@ class UserLogin:
 
         # Logging objects
 
-        self.Logger = maplex.Logger("UserLogin")
+        self.logger = maplex.Logger(__name__)
 
         # Variables
 
@@ -18,12 +18,12 @@ class UserLogin:
         self.userPassword = Tools.stringHasher().hashString(userPassword, userName)
         self.userTableAdapter = UserTableAdapters()
 
-        self.Logger.Info(f"UserLogin instance created for user [{self.userName}].")
+        self.logger.info(f"UserLogin instance created for user [{self.userName}].")
 
     def close(self):
 
         self.userTableAdapter.closeConnection()
-        self.Logger.Info("Closed UserLogin object.")
+        self.logger.info("Closed UserLogin object.")
 
     def updateLoginFailed(self, userId: int, failedCount: int, failedAt: datetime.datetime | None = None) -> str:
 
@@ -33,7 +33,7 @@ class UserLogin:
 
             if failedAt is not None:
 
-                self.Logger.Debug(f"Last failed login at {failedAt}, current failed count is {failedCount}.")
+                self.logger.debug(f"Last failed login at {failedAt}, current failed count is {failedCount}.")
                 suspendCount = failedCount - 2
                 suspendTime = datetime.timedelta(minutes=30 * suspendCount)
 
@@ -47,7 +47,7 @@ class UserLogin:
 
                 if failedCount >= 3:
 
-                    self.Logger.Info(f"User ID [{userId}] account suspended due to multiple failed login attempts.")
+                    self.logger.info(f"User ID [{userId}] account suspended due to multiple failed login attempts.")
                     status = "suspended"
 
                 # Update failed time
@@ -59,7 +59,7 @@ class UserLogin:
         
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to update login failed info.")
+            self.logger.ShowError(e, "Failed to update login failed info.")
             raise
 
     def checkSuspended(self, userId: int, failedCount: int, failedAt: datetime.datetime | None) -> str:
@@ -70,25 +70,25 @@ class UserLogin:
 
             if failedAt is not None:
 
-                self.Logger.Debug(f"Last failed login at {failedAt}, current failed count is {failedCount}.")
+                self.logger.debug(f"Last failed login at {failedAt}, current failed count is {failedCount}.")
                 suspendCount = failedCount - 2
                 suspendTime = datetime.timedelta(minutes=30 * suspendCount)
 
                 if datetime.datetime.now() < failedAt + suspendTime:
 
-                    self.Logger.Info(f"User account is currently suspended due to multiple failed login attempts.")
+                    self.logger.info(f"User account is currently suspended due to multiple failed login attempts.")
                     status = "suspended"
 
                 else:
 
-                    self.Logger.Debug(f"Suspend time has passed. User account is no longer suspended.")
+                    self.logger.debug(f"Suspend time has passed. User account is no longer suspended.")
                     self.updateLoginFailed(userId, 0, None)
 
             return status
         
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to check suspended status.")
+            self.logger.ShowError(e, "Failed to check suspended status.")
             raise
 
     def Login(self) -> dict:
@@ -117,7 +117,7 @@ class UserLogin:
 
         if self.userName == "":
 
-            self.Logger.Warn("User name is blank. (This log should not be outputed.)")
+            self.logger.warn("User name is blank. (This log should not be outputed.)")
             retDict["LoginResult"]["Message"] = "User name is blank."
             return retDict
 
@@ -129,7 +129,7 @@ class UserLogin:
 
                 if len(userList) > 1:
 
-                    self.Logger.Warn("Invalid user info: Duplicate user name.")
+                    self.logger.warn("Invalid user info: Duplicate user name.")
                     return retDict
                 
                 userStatus = userList[0][9]
@@ -137,7 +137,7 @@ class UserLogin:
                 if userStatus == "inactive":
 
                     # Treat inactive users as non-loginable
-                    self.Logger.Warn(f"User account is inactive state.")
+                    self.logger.warn(f"User account is inactive state.")
                     retDict["LoginResult"]["Message"] = f"User account is inactive state."
                     return retDict
                 
@@ -159,13 +159,13 @@ class UserLogin:
                     
                     if userStatus == "suspended":
 
-                        self.Logger.Info("Invalid user info: Invalid user password and account is suspended.")
+                        self.logger.info("Invalid user info: Invalid user password and account is suspended.")
                         retDict["LoginResult"]["Message"] = "User suspended due to multiple failed login attempts."
                         return retDict
                     
                     else:
 
-                        self.Logger.Info("Invalid user info: Invalid user password.")
+                        self.logger.info("Invalid user info: Invalid user password.")
 
                     return retDict
 
@@ -175,7 +175,7 @@ class UserLogin:
 
                     if self.checkSuspended(userList[0][0], userList[0][7], userList[0][8]) == "suspended":
 
-                        self.Logger.Info("Invalid user info: User account is still suspended.")
+                        self.logger.info("Invalid user info: User account is still suspended.")
                         retDict["LoginResult"]["Message"] = "User suspended due to multiple failed login attempts."
                         return retDict
 
@@ -191,7 +191,7 @@ class UserLogin:
 
                 if not sessionInfo:
 
-                    self.Logger.Warn("Invalid session info: Duplicate session.")
+                    self.logger.warn("Invalid session info: Duplicate session.")
                     retDict["LoginResult"]["Message"] = "There is another session remains from another computer."
                     return retDict
 
@@ -211,11 +211,11 @@ class UserLogin:
 
             else:
 
-                self.Logger.Warn("User name not found.")
+                self.logger.warn("User name not found.")
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to login.")
+            self.logger.ShowError(e, "Failed to login.")
             retDict["ErrorInfo"]["Error"] = True
             retDict["ErrorInfo"]["Message"] = f"{e}"
         
@@ -227,7 +227,7 @@ class UserPasswordUpdate:
 
         # Logging objects
 
-        self.Logger = maplex.Logger("UserPasswordUpdate")
+        self.logger = maplex.Logger(__name__)
 
         # Variables
 
@@ -244,7 +244,7 @@ class UserPasswordUpdate:
 
         self.userTableAdapter.closeConnection()
         self.sessionTableAdapter.close()
-        self.Logger.Info("Closed UserPasswordUpdate object.")
+        self.logger.info("Closed UserPasswordUpdate object.")
 
     def Update(self):
 
@@ -258,7 +258,7 @@ class UserPasswordUpdate:
             if not self.sessionTableAdapter.IsValid():
 
                 retDict["Message"] = "Session time out."
-                self.Logger.Error("User session time out.")
+                self.logger.error("User session time out.")
                 return retDict
 
             sessionData = self.sessionTableAdapter.GetSessionInfo()
@@ -269,7 +269,7 @@ class UserPasswordUpdate:
             if not Tools.CheckPasswordPattern(self.userPassword):
 
                 retDict["Message"] = "Bad password: Password must be at least 8 characters long and contain uppercase, lowercase, digit, and special character."
-                self.Logger.Error("Bad password pattern.")
+                self.logger.error("Bad password pattern.")
                 return retDict
             
             # Get user data
@@ -279,13 +279,13 @@ class UserPasswordUpdate:
             if not userDataList:
 
                 retDict["Message"] = "User not found."
-                self.Logger.Error("User not found.")
+                self.logger.error("User not found.")
                 return retDict
 
             if len(userDataList) > 1:
 
                 retDict["Message"] = "Duplicate user name."
-                self.Logger.Error("Duplicate user name.")
+                self.logger.error("Duplicate user name.")
                 return retDict
             
             userData = userDataList[0]
@@ -302,7 +302,7 @@ class UserPasswordUpdate:
                 if sessionAccessLevel != accessLevel["super"] and sessionData[1] != userData[6]:
 
                     retDict["Message"] = "User has no authority to change the password."
-                    self.Logger.Error("User has no authority to change password: Company mismatch.")
+                    self.logger.error("User has no authority to change password: Company mismatch.")
                     return retDict
                 
                 # Check access level
@@ -312,7 +312,7 @@ class UserPasswordUpdate:
                 if sessionAccessLevel <= userAccessLevel:
 
                     retDict["Message"] = "User has no authority to change the password."
-                    self.Logger.Error(f"User has no authority to change password: [User: {sessionAccessLevel} / Target: {userAccessLevel}]")
+                    self.logger.error(f"User has no authority to change password: [User: {sessionAccessLevel} / Target: {userAccessLevel}]")
                     return retDict
 
             else:
@@ -325,7 +325,7 @@ class UserPasswordUpdate:
                 if dbOldPassword != userOldPasswordHash:
 
                     retDict["Message"] = "Password incorrect."
-                    self.Logger.Error("User old password did not match.")
+                    self.logger.error("User old password did not match.")
                     return retDict
 
             # Authentication complete
@@ -337,11 +337,11 @@ class UserPasswordUpdate:
             self.userTableAdapter.updateUserPassword(userData[0], newPasswordHash, sessionData[0])
             retDict["Update"] = True
             retDict["Message"] = "Password updated successfully."
-            self.Logger.Info("User password updated successfully.")
+            self.logger.info("User password updated successfully.")
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to update password.")
+            self.logger.ShowError(e, "Failed to update password.")
             retDict["ErrorInfo"]["Error"] = True
             retDict["ErrorInfo"]["Message"] = f"{e}"
 
@@ -353,7 +353,7 @@ class UserInfo:
 
         # Logging objects
 
-        self.Logger = maplex.Logger("UserInfo")
+        self.logger = maplex.Logger(__name__)
 
         # Table adapters
 
@@ -368,7 +368,7 @@ class UserInfo:
 
         self.userTableAdapter.closeConnection()
         self.sessionData.close()
-        self.Logger.Info("Closed UserInfo object.")
+        self.logger.info("Closed UserInfo object.")
 
     def getUserInfo(self, userId: int | None = None, userName: str | None = None, eMail: str | None = None, accessLevel: str | None = None, companyId: int | None = None, userStatus: str | None = None, active: bool | None = None) -> list[dict] | None:
 
@@ -380,7 +380,7 @@ class UserInfo:
 
             retDict["ErrorInfo"]["Error"] = True
             retDict["ErrorInfo"]["Message"] = "At least one search condition must be specified."
-            self.Logger.Error("At least one search condition must be specified.")
+            self.logger.error("At least one search condition must be specified.")
             return retDict
 
         try:
@@ -391,7 +391,7 @@ class UserInfo:
 
                 retDict["ErrorInfo"]["Error"] = True
                 retDict["ErrorInfo"]["Message"] = "Session time out."
-                self.Logger.Error("User session time out.")
+                self.logger.error("User session time out.")
                 return retDict
             
             sessionInfo = self.sessionData.GetSessionInfo()
@@ -404,14 +404,14 @@ class UserInfo:
 
                 retDict["ErrorInfo"]["Error"] = True
                 retDict["ErrorInfo"]["Message"] = "User has no authority to get user information."
-                self.Logger.Error(f"User has no authority to get user information: Access level [{sessionAccessLevel}]")
+                self.logger.error(f"User has no authority to get user information: Access level [{sessionAccessLevel}]")
                 return retDict
             
             if companyId is not None and sessionCompanyId != companyId and sessionAccessLevel != "super":
 
                 retDict["ErrorInfo"]["Error"] = True
                 retDict["ErrorInfo"]["Message"] = "User has no authority to get user information.\nCannot search other company user."
-                self.Logger.Error(f"User has no authority to get user information: Company mismatch. [Session: {sessionCompanyId} / Request: {companyId}]")
+                self.logger.error(f"User has no authority to get user information: Company mismatch. [Session: {sessionCompanyId} / Request: {companyId}]")
                 return retDict
             
             if accessLevel is not None:
@@ -422,14 +422,14 @@ class UserInfo:
 
                     retDict["ErrorInfo"]["Error"] = True
                     retDict["ErrorInfo"]["Message"] = "Bad access level."
-                    self.Logger.Error(f"Bad access level: {accessLevel}")
+                    self.logger.error(f"Bad access level: {accessLevel}")
                     return retDict
                 
                 if accessLevelDict[sessionAccessLevel] <= accessLevelDict[accessLevel] and sessionAccessLevel != "super":
 
                     retDict["ErrorInfo"]["Error"] = True
                     retDict["ErrorInfo"]["Message"] = "User has no authority to get user information.\nCannot search same or higher access level user."
-                    self.Logger.Error(f"User has no authority to get user information: Access level too high. [Session: {sessionAccessLevel} / Request: {accessLevel}]")
+                    self.logger.error(f"User has no authority to get user information: Access level too high. [Session: {sessionAccessLevel} / Request: {accessLevel}]")
                     return retDict
                 
             # Get user info
@@ -448,7 +448,7 @@ class UserInfo:
 
                     except Exception as e:
 
-                        self.Logger.ShowError(e, "Failed to check if user is active.")
+                        self.logger.ShowError(e, "Failed to check if user is active.")
                         isActive = False
 
                     if active is not None and isActive != active:
@@ -470,7 +470,7 @@ class UserInfo:
         
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to get user information.")
+            self.logger.ShowError(e, "Failed to get user information.")
             retDict["ErrorInfo"]["Error"] = True
             retDict["ErrorInfo"]["Message"] = f"{e}"
             return retDict
@@ -487,7 +487,7 @@ class UserInfo:
 
                 retDict["ErrorInfo"]["Error"] = True
                 retDict["ErrorInfo"]["Message"] = "Session time out."
-                self.Logger.Error("User session time out.")
+                self.logger.error("User session time out.")
                 return retDict
             
             sessionInfo = self.sessionData.GetSessionInfo()
@@ -500,7 +500,7 @@ class UserInfo:
 
                 retDict["ErrorInfo"]["Error"] = True
                 retDict["ErrorInfo"]["Message"] = "Guest user has no authority to add user."
-                self.Logger.Error(f"Guest user has no authority to add user: Access level [{sessionAccessLevel}]")
+                self.logger.error(f"Guest user has no authority to add user: Access level [{sessionAccessLevel}]")
                 return retDict
             
             if sessionAccessLevel != "super":
@@ -513,7 +513,7 @@ class UserInfo:
 
                     retDict["ErrorInfo"]["Error"] = True
                     retDict["ErrorInfo"]["Message"] = "User has no authority to add user.\nCannot add user to other company."
-                    self.Logger.Error(f"User has no authority to add user: Company mismatch. [Session: {sessionInfo[1]} / Request: {companyId}]")
+                    self.logger.error(f"User has no authority to add user: Company mismatch. [Session: {sessionInfo[1]} / Request: {companyId}]")
                     return retDict
                 
             # Check value validity
@@ -522,28 +522,28 @@ class UserInfo:
 
                 retDict["ErrorInfo"]["Error"] = True
                 retDict["ErrorInfo"]["Message"] = "Bad access level."
-                self.Logger.Error(f"Bad access level: {accessLevel}")
+                self.logger.error(f"Bad access level: {accessLevel}")
                 return retDict
 
             if userStatus not in ["active", "inactive", "suspended"]:
 
                 retDict["ErrorInfo"]["Error"] = True
                 retDict["ErrorInfo"]["Message"] = "Bad user status."
-                self.Logger.Error(f"Bad user status: {userStatus}")
+                self.logger.error(f"Bad user status: {userStatus}")
                 return retDict
             
             if not Tools.CheckPasswordPattern(password):
 
                 retDict["ErrorInfo"]["Error"] = True
                 retDict["ErrorInfo"]["Message"] = "Bad password: Password must be at least 8 characters long and contain uppercase, lowercase, digit, and special character."
-                self.Logger.Error("Bad password pattern.")
+                self.logger.error("Bad password pattern.")
                 return retDict
             
             if accessLevel != "super" and companyId is None:
 
                 retDict["ErrorInfo"]["Error"] = True
                 retDict["ErrorInfo"]["Message"] = "Company must be specified for non-Super users."
-                self.Logger.Error("Company must be specified for non-Super users.")
+                self.logger.error("Company must be specified for non-Super users.")
                 return retDict
             
             # Add user
@@ -562,13 +562,13 @@ class UserInfo:
             if retDict["Created"]:
 
                 retDict["UserID"] = self.userTableAdapter.selectUser(userName=userName)[0][0]
-                self.Logger.Info(f"User [{userName}] added successfully. [UserID: {retDict['UserID']}]")
+                self.logger.info(f"User [{userName}] added successfully. [UserID: {retDict['UserID']}]")
 
             return retDict
         
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to add user.")
+            self.logger.ShowError(e, "Failed to add user.")
             retDict["ErrorInfo"]["Error"] = True
             retDict["ErrorInfo"]["Message"] = f"{e}"
             return retDict

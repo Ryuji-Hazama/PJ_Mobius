@@ -15,17 +15,17 @@ class CompanyTableAdapters:
         
         # Logging objects
 
-        self.Logger = maplex.Logger("CompanyTableAdapters")
+        self.logger = maplex.Logger(__name__)
 
         try:
 
             self.connection = DbConnection().connect()
             self.cursor = self.connection.cursor()
-            self.Logger.Info("Database connection established.")
+            self.logger.info("Database connection established.")
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to connect database.")
+            self.logger.ShowError(e, "Failed to connect database.")
             raise
 
     def closeConnection(self):
@@ -34,11 +34,11 @@ class CompanyTableAdapters:
 
             self.cursor.close()
             self.connection.close()
-            self.Logger.Info("Database connection closed.")
+            self.logger.info("Database connection closed.")
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to close database connection.")
+            self.logger.ShowError(e, "Failed to close database connection.")
             raise
 
     #################################
@@ -55,13 +55,13 @@ class CompanyTableAdapters:
                 f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
             self.cursor.execute(sql, (companyName, companyPhone, companyZipCode, companyAddress, companyEmail, contractLevel, createUserId, createUserId))
             self.connection.commit()
-            self.Logger.Info("New company info created.")
+            self.logger.info("New company info created.")
 
             return True
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to insert new company info.")
+            self.logger.ShowError(e, "Failed to insert new company info.")
             raise
 
     #################################
@@ -75,7 +75,7 @@ class CompanyTableAdapters:
 
             # If the parameters are all empty
 
-            self.Logger.Warn("Selecting all Companies at once is not allowed.")
+            self.logger.warn("Selecting all Companies at once is not allowed.")
             return None
 
         try:
@@ -115,7 +115,7 @@ class CompanyTableAdapters:
                 replaceList.append(contractLevel)
 
             sql += ";"
-            self.Logger.Debug(f"Select Company SQL: {sql} with {replaceList}")
+            self.logger.debug(f"Select Company SQL: {sql} with {replaceList}")
 
             # Execute sql
 
@@ -124,7 +124,7 @@ class CompanyTableAdapters:
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to select company informantions.")
+            self.logger.ShowError(e, "Failed to select company informantions.")
             raise
 
     def searchCompany(self, companyName: str | None = None, companyAddress: str | None = None, companyEmail: str | None = None, orSearch: bool = False) -> tuple[tuple] | None:
@@ -135,7 +135,7 @@ class CompanyTableAdapters:
 
             # If the parameters are all empty
 
-            self.Logger.Warn("Searching all Companies at once is not allowed.")
+            self.logger.warn("Searching all Companies at once is not allowed.")
             return None
 
         try:
@@ -168,7 +168,7 @@ class CompanyTableAdapters:
 
                 # Maybe not use this for security reason?
 
-                self.Logger.Warn("Searching by company email is not recommended for security reason.")
+                self.logger.warn("Searching by company email is not recommended for security reason.")
                 
                 if nextOption:
 
@@ -186,5 +186,5 @@ class CompanyTableAdapters:
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to search company informantions.")
+            self.logger.ShowError(e, "Failed to search company informantions.")
             raise

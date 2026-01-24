@@ -12,22 +12,32 @@ from routers import admin, auth, users, companies, health
 ############################################
 # Logging objects
 
-Logger = maplex.Logger("AppEndPoint")
+logger = maplex.Logger(__name__)
+logger.info("Initializing AppEndPoint.")
 
-############################################
-# Initialize FastAPI instance
+try:
 
-Logger.Info("Initializing FastAPI.")
-app = FastAPI()
-Logger.Info("FastAPI initialized.")
+    ############################################
+    # Initialize FastAPI instance
 
-############################################
-# Register routers
+    logger.info("Initializing FastAPI.")
+    app = FastAPI()
+    logger.info("FastAPI initialized.")
 
-app.include_router(admin.router)
-app.include_router(auth.router)
-app.include_router(users.router)
-app.include_router(companies.router)
-app.include_router(health.router)
+    ############################################
+    # Register routers
 
-Logger.Info("All routers registered successfully.")
+    app.include_router(admin.router)
+    app.include_router(auth.router)
+    app.include_router(users.router)
+    app.include_router(companies.router)
+    app.include_router(health.router)
+
+    logger.info("All routers registered successfully.")
+
+except Exception as e:
+
+    logger.ShowError(e, "Failed to initialize AppEndPoint.")
+    exit(1)
+
+logger.info("AppEndPoint initialized successfully.")

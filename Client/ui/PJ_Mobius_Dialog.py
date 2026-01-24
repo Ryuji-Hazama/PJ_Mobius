@@ -38,7 +38,7 @@ class ProcessRequest(ttk.Frame):
 
         # Logging objects
 
-        self.Logger = maplex.Logger("ProcessRequest")
+        self.logger = maplex.Logger(__name__)
 
         self.master = ttk.Toplevel(titleMessage, resizable=(False, False), topmost=True)
 
@@ -58,7 +58,7 @@ class ProcessRequest(ttk.Frame):
         self.progressBar.pack(pady=10)
         self.progressBar.start()
 
-        self.Logger.Info("Process window loaded.")
+        self.logger.info("Process window loaded.")
 
         self.master.grab_set()
 

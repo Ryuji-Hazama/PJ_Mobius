@@ -9,7 +9,7 @@ class InitSuperUser:
 
         # Logging class
 
-        self.Logger = maplex.Logger("InitSuperUser")
+        self.logger = maplex.Logger(__name__)
 
         # Variables
 
@@ -27,7 +27,7 @@ class InitSuperUser:
 
     def checkPassword(self) -> bool:
 
-        self.Logger.Info("Checking system password.")
+        self.logger.info("Checking system password.")
 
         try:
 
@@ -43,7 +43,7 @@ class InitSuperUser:
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to get admin informations.")
+            self.logger.ShowError(e, "Failed to get admin informations.")
             raise
 
         return hashedPassword == envPassword
@@ -58,7 +58,7 @@ class InitSuperUser:
         
         except Exception as e:
 
-            self.Logger.ShowError(e)
+            self.logger.ShowError(e)
             raise
 
     def initSuperUser(self) -> bool:
@@ -67,17 +67,17 @@ class InitSuperUser:
                 
             if not self.checkPassword():
 
-                self.Logger.Info("System password incorrect.")
+                self.logger.info("System password incorrect.")
                 return False
             
             elif not self.checkFirstEntry():
 
-                self.Logger.Info("Another user info already exists.")
+                self.logger.info("Another user info already exists.")
                 return False
             
             return self.tableAdapter.insertUser(self.superUserName, "default@default", self.superPassWd, accessLevel="super")
             
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to create super user data.")
+            self.logger.ShowError(e, "Failed to create super user data.")
             raise

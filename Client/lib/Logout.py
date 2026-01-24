@@ -16,7 +16,7 @@ class Logout:
 
         # Logging objects
 
-        self.Logger = maplex.Logger("Logout")
+        self.logger = maplex.Logger(__name__)
 
         try:
 
@@ -36,12 +36,12 @@ class Logout:
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to read configuration file.")
+            self.logger.ShowError(e, "Failed to read configuration file.")
             Dialog("Error", "Failed to read app configurations.").showDialog()
 
     def logOut(self, processLogin, quit: bool):
 
-        self.Logger.Info("Logging out.")
+        self.logger.info("Logging out.")
 
         try:
 
@@ -53,15 +53,15 @@ class Logout:
 
             for i in range(3):
 
-                self.Logger.Info(f"Logout request: {i + 1} / 3")
+                self.logger.info(f"Logout request: {i + 1} / 3")
                 response = requests.patch(url, json=requestPayload, verify=self.verify, timeout=self.timeout)
 
                 if response.status_code == 200:
 
                     break
 
-                self.Logger.Warn(f"Failed to logout.")
-                self.Logger.Info(f"Status code: {response.status_code}")
+                self.logger.warn(f"Failed to logout.")
+                self.logger.info(f"Status code: {response.status_code}")
 
                 if i < 2:
 
@@ -70,7 +70,7 @@ class Logout:
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to logout.")
+            self.logger.ShowError(e, "Failed to logout.")
             Dialog("Warn", "Failed to logout because of the following error:\n"
                                     f"{e}").showDialog()
             
@@ -88,7 +88,7 @@ class Logout:
                 
             except KeyError as ke:
 
-                self.Logger.Warn(f"Environment variable does not exists: {ke}")
+                self.logger.warn(f"Environment variable does not exists: {ke}")
 
             processLogin.closeWindow()
 
@@ -96,13 +96,13 @@ class Logout:
 
             if response.status_code != 200:
 
-                self.Logger.Error(f"Failedt to logout.")
+                self.logger.error(f"Failedt to logout.")
                 Dialog("Warn", "Failed to logout.\n"
                                         f"Response status code: {response.status_code}").showDialog()
                 
             elif not response.json()["Update"]:
 
-                self.Logger.Error(f"Failed to logout: {response.json()["ErrorInfo"]["Message"]}")
+                self.logger.error(f"Failed to logout: {response.json()["ErrorInfo"]["Message"]}")
                 Dialog("Warn", "Failed to logout because of the following reason:\n"
                                         f"{response.json()["ErrorInfo"]["Message"]}").showDialog()
 

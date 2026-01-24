@@ -8,7 +8,7 @@ class SessionUpdate:
 
         # Logging objects
 
-        self.Logger = maplex.Logger("UserLogout")
+        self.logger = maplex.Logger(__name__)
 
     def Update(self, token: str, update: str) -> bool:
 
@@ -20,7 +20,7 @@ class SessionUpdate:
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to logout.")
+            self.logger.ShowError(e, "Failed to logout.")
             raise
 
         finally:
@@ -40,19 +40,19 @@ class SessionUpdate:
 
             if not sessionId:
 
-                self.Logger.Error("Failed to create new session.")
+                self.logger.error("Failed to create new session.")
                 return None
 
             sessionInfo = tableAdapter.selectSessionInfo(sessionId)
 
             if not sessionInfo:
 
-                self.Logger.Error("Failed to get new session info.")
+                self.logger.error("Failed to get new session info.")
                 return None
             
             elif len(sessionInfo) > 1:
 
-                self.Logger.Error("Duplicate new session info.")
+                self.logger.error("Duplicate new session info.")
                 return None
 
             sessionInfoDict = {
@@ -67,7 +67,7 @@ class SessionUpdate:
         
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to create new session.")
+            self.logger.ShowError(e, "Failed to create new session.")
             raise
 
         finally:
@@ -82,7 +82,7 @@ class CheckSession:
 
         # Logging objects
 
-        self.Logger = maplex.Logger("CheckSession")
+        self.logger = maplex.Logger(__name__)
 
         self.token = token
 
@@ -93,7 +93,7 @@ class CheckSession:
     def close(self):
 
         self.tableAdapter.closeConnection()
-        self.Logger.Info("Closed CheckSession object.")
+        self.logger.info("Closed CheckSession object.")
 
     def IsValid(self, updateSessionTime=True):
 
@@ -105,7 +105,7 @@ class CheckSession:
 
             if not sessionInfo:
 
-                self.Logger.Warn("Invalid session info: Session not found.")
+                self.logger.warn("Invalid session info: Session not found.")
                 return False
 
             # Check expire time
@@ -114,7 +114,7 @@ class CheckSession:
 
             if sessionInfo[0][3] < currentTime:
 
-                self.Logger.Warn("Invalid session info: Session expired.")
+                self.logger.warn("Invalid session info: Session expired.")
                 return False
 
             if updateSessionTime:
@@ -125,7 +125,7 @@ class CheckSession:
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to check session.")
+            self.logger.ShowError(e, "Failed to check session.")
             raise
 
     def GetSessionInfo(self):
@@ -140,14 +140,14 @@ class CheckSession:
 
             if not sessionInfo:
 
-                self.Logger.Warn("Invalid session info: Session not found.")
+                self.logger.warn("Invalid session info: Session not found.")
                 return None
 
             return sessionInfo[0]
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to get session info.")
+            self.logger.ShowError(e, "Failed to get session info.")
             raise
 
     def isActive(self, userId: int) -> bool:
@@ -161,13 +161,13 @@ class CheckSession:
 
             if not sessionInfo:
 
-                self.Logger.Info(f"User {userId} is not active.")
+                self.logger.info(f"User {userId} is not active.")
                 return False
             
-            self.Logger.Info(f"User {userId} is active.")
+            self.logger.info(f"User {userId} is active.")
             return True
         
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to check if user is active.")
+            self.logger.ShowError(e, "Failed to check if user is active.")
             raise

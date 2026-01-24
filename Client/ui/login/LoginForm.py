@@ -20,7 +20,7 @@ class LoginForm(ttk.Frame):
 
         # Logging objects
 
-        self.Logger = maplex.Logger("LogInForm")
+        self.logger = maplex.Logger(__name__)
 
         # Values
 
@@ -37,17 +37,17 @@ class LoginForm(ttk.Frame):
             try:
 
                 self.timeout = int(timeoutStr)
-                self.Logger.Debug(f"Timeout set to {self.timeout} seconds.")
+                self.logger.debug(f"Timeout set to {self.timeout} seconds.")
 
             except ValueError:
 
-                self.Logger.Warn(f"Invalid timeout value: {timeoutStr}")
+                self.logger.warn(f"Invalid timeout value: {timeoutStr}")
                 self.timeout = 30  # Default timeout
-                self.Logger.Debug(f"Timeout set to default: {self.timeout} seconds.")
+                self.logger.debug(f"Timeout set to default: {self.timeout} seconds.")
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to read configuration file.")
+            self.logger.ShowError(e, "Failed to read configuration file.")
             Dialog("Error", "Failed to read app configurations.").showDialog()
 
         # Header info
@@ -62,7 +62,7 @@ class LoginForm(ttk.Frame):
         self.createPassWdEntry("Password", self.passwd)
         self.create_buttons()
 
-        self.Logger.Info("Login form loaded.")
+        self.logger.info("Login form loaded.")
 
     def createIDEntry(self, label, variable):
 
@@ -131,7 +131,7 @@ class LoginForm(ttk.Frame):
 
             if domain in {None, ""}:
 
-                self.Logger.Error("No domain info.")
+                self.logger.error("No domain info.")
                 Dialog("Error", "Server domain has not set.").showDialog()
                 return
 
@@ -144,7 +144,7 @@ class LoginForm(ttk.Frame):
 
                 # If one of the entry is empty
 
-                self.Logger.Info("Empty entry.")
+                self.logger.info("Empty entry.")
                 Dialog("Warn", "The entry is empty!").showDialog()
                 return
             
@@ -158,7 +158,7 @@ class LoginForm(ttk.Frame):
 
                 processLogin.closeWindow()
 
-            self.Logger.ShowError(e, "Failed to login.")
+            self.logger.ShowError(e, "Failed to login.")
             Dialog("Error", f"Unexpected error: \n"
                                       f"{e}\n\n"
                                       f"Please contact to support.").showDialog()
@@ -171,13 +171,13 @@ class LoginForm(ttk.Frame):
                 
                 self.master.update()
                 response = requests.get(url, json=requestPayload, verify=self.verify, timeout=self.timeout)
-                self.Logger.Info(f"Login attempt {i + 1} / 3 status code: {response.status_code}")
+                self.logger.info(f"Login attempt {i + 1} / 3 status code: {response.status_code}")
 
                 if response.status_code == 200:
 
                     break
 
-                self.Logger.Warn(f"Failed to request: {i + 1} / 3")
+                self.logger.warn(f"Failed to request: {i + 1} / 3")
 
                 if i < 2:
 
@@ -188,7 +188,7 @@ class LoginForm(ttk.Frame):
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to login.")
+            self.logger.ShowError(e, "Failed to login.")
             Dialog("Error", f"{e}").showDialog()
             return
 
@@ -200,7 +200,7 @@ class LoginForm(ttk.Frame):
 
         if response.status_code != 200:
 
-            self.Logger.Error(f"Request failed with status code: {response.status_code}")
+            self.logger.error(f"Request failed with status code: {response.status_code}")
             Dialog("Warn", f"Request failed with status code: {response.status_code}\n\n"
                                     "The server domain is wrong or the server is temporary not responding.\n"
                                     "Please try again later and contact to support if the problem will not solve.")\
@@ -211,7 +211,7 @@ class LoginForm(ttk.Frame):
 
         if responseJson["ErrorInfo"]["Error"]:
 
-            self.Logger.Error(f"Error occrred while login: {responseJson["ErrorInfo"]["Message"]}")
+            self.logger.error(f"Error occrred while login: {responseJson["ErrorInfo"]["Message"]}")
             Dialog("Warn", f"Failed to login because of the following error:\n"
                                     f"{responseJson["ErrorInfo"]["Message"]}\n\n"
                                     "Please contact to the support and try later.").showDialog()
@@ -219,7 +219,7 @@ class LoginForm(ttk.Frame):
         
         if not responseJson["LoginResult"]["Login"]:
 
-            self.Logger.Info(f"Failed to login: {responseJson["LoginResult"]["Message"]}")
+            self.logger.info(f"Failed to login: {responseJson["LoginResult"]["Message"]}")
             Dialog("Info", f"Failed to login:\n{responseJson["LoginResult"]["Message"]}")\
                 .showDialog()
             return
@@ -236,7 +236,7 @@ class LoginForm(ttk.Frame):
 
             if not InitPasswordForm(self.id.get(), self.passwd.get()).show():
 
-                self.Logger.Info("Cancel initialization.")
+                self.logger.info("Cancel initialization.")
                 processLogin = ProcessRequest("Logging out...")
                 t = threading.Thread(target=Logout(self.callback).logOut, args=(processLogin, False))
                 t.start()
@@ -246,5 +246,5 @@ class LoginForm(ttk.Frame):
 
     def buttonSetClicked(self):
 
-        self.Logger.Info("Set Domain clicked.")
+        self.logger.info("Set Domain clicked.")
         SetDomainForm()

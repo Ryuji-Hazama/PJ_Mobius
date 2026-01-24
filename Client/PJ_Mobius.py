@@ -10,8 +10,8 @@ class App:
 
         # Logging objects
 
-        self.Logger = maplex.Logger("App")
-        self.Logger.Info("Initializing App.")
+        self.logger = maplex.Logger(__name__)
+        self.logger.info("Initializing App.")
 
         # Generate window form
 
@@ -19,7 +19,7 @@ class App:
         self.current_frame = None
         self.switchWindow("Login")
 
-        self.Logger.Info("""App initialized.
+        self.logger.info("""App initialized.
 Welcome to...
 
 \033[92m PPPPPPPP       JJJJJ        \033[91m MM       MM   OOOOOOO   BBBBBBB    IIIIII  UU     UU   SSSSSSS
@@ -36,7 +36,7 @@ Welcome to...
 
         try:
 
-            self.Logger.Info(f"Switching to [{targetWindow}] window.")
+            self.logger.info(f"Switching to [{targetWindow}] window.")
 
             if self.current_frame:
 
@@ -56,12 +56,12 @@ Welcome to...
 
         except Exception as e:
 
-            self.Logger.ShowError(e, f"Failed to switch window to [{targetWindow}]", True)
+            self.logger.ShowError(e, f"Failed to switch window to [{targetWindow}]", True)
 
     def run(self):
 
         self.root.mainloop()
-        self.Logger.Info("Quitting App.")
+        self.logger.info("Quitting App.")
 
 if __name__ == "__main__":
 

@@ -18,7 +18,7 @@ class MainMenuForm(ttk.Frame):
 
         # Logging objects
 
-        self.Logger = maplex.Logger("MainMenu")
+        self.logger = maplex.Logger(__name__)
 
         self.callback = callback
         master.geometry("+%d+%d"%(50, 30))
@@ -39,7 +39,7 @@ class MainMenuForm(ttk.Frame):
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to read configuration file.")
+            self.logger.ShowError(e, "Failed to read configuration file.")
             Dialog("Error", "Failed to read app configurations.").showDialog()
 
     def menuWindow(self, master):
@@ -71,7 +71,7 @@ class MainMenuForm(ttk.Frame):
 
             userId = int(os.getenv("PJ_MOBIUS_USER"))
             userData = UserInfo().getUserInfo(userId=userId)
-            self.Logger.Info(f"User data: {userData}")  # Delete this line in production
+            self.logger.info(f"User data: {userData}")  # Delete this line in production
 
             if userData is None or len(userData) != 1:
 
@@ -79,7 +79,7 @@ class MainMenuForm(ttk.Frame):
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to get user data from server.")
+            self.logger.ShowError(e, "Failed to get user data from server.")
             Dialog("Error", "Failed to get user data from server.").showDialog()
             userData = None
 
@@ -129,7 +129,7 @@ class MainMenuForm(ttk.Frame):
         if os.getenv("PJ_MOBIUS_COMPANY") not in NONE_LIST:
 
             companyList = CompanyInfo().getCompanyInfo()
-            self.Logger.Info(f"Company info: {companyList}")
+            self.logger.info(f"Company info: {companyList}")
 
             if companyList is not None and len(companyList) == 1:
 
@@ -139,7 +139,7 @@ class MainMenuForm(ttk.Frame):
                 lblCompanyName.configure(font=("", 12))
                 lblCompanyName.grid(row=2, column=0, pady=(0, 5), sticky=W)
 
-                self.Logger.Info(f"User is associated with company: {companyName}")
+                self.logger.info(f"User is associated with company: {companyName}")
 
             elif companyList is not None and len(companyList) > 1:
 
@@ -149,7 +149,7 @@ class MainMenuForm(ttk.Frame):
                 lblCompanyName.configure(font=("", 12))
                 lblCompanyName.grid(row=2, column=0, pady=(0, 5), sticky=W)
 
-                self.Logger.Warn("User is associated with multiple companies.")
+                self.logger.warn("User is associated with multiple companies.")
 
             else:
                 
@@ -157,11 +157,11 @@ class MainMenuForm(ttk.Frame):
                 lblCompanyName.configure(font=("", 12))
                 lblCompanyName.grid(row=2, column=0, pady=(0, 5), sticky=W)
 
-                self.Logger.Info("User's company information is not found.")
+                self.logger.info("User's company information is not found.")
 
         else:
 
-            self.Logger.Info("User is not associated with any company.")
+            self.logger.info("User is not associated with any company.")
 
         master.add(self.right_f)
 
@@ -201,23 +201,23 @@ class MainMenuForm(ttk.Frame):
 
     def logoutButtonClicked(self):
 
-        self.Logger.Info("Log out.")
+        self.logger.info("Log out.")
         self.windowClosing(False)
 
     def quitButtonClicked(self):
 
-        self.Logger.Info("Quitting from main menu.")
+        self.logger.info("Quitting from main menu.")
         self.windowClosing(True)
 
     def windowClosing(self, quit: bool = False):
 
         try:
 
-            self.Logger.Info("Closing main menu window.")
+            self.logger.info("Closing main menu window.")
             processLogin = ProcessRequest("Logging out...")
             t = threading.Thread(target=Logout(self.callback, self).logOut, args=(processLogin, quit))
             t.start()
 
         except Exception as e:
 
-            self.Logger.ShowError(e)
+            self.logger.ShowError(e)

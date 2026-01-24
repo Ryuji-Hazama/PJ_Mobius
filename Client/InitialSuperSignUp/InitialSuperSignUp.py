@@ -11,7 +11,7 @@ Logger = maplex.Logger("InitSuperUser")
 ###################################
 # Main method
 
-Logger.Info("Start")
+Logger.info("Start")
 
 try:
 
@@ -62,25 +62,25 @@ try:
 
                 if result["ErrorInfo"]["Error"]:
 
-                    Logger.Error(f"Server returned error: {result["ErrorInfo"]["ErrorMessage"]}")
+                    Logger.error(f"Server returned error: {result["ErrorInfo"]["ErrorMessage"]}")
                     print(f"\nFailed to register supre user.")
 
                 elif result["Registered"]:
 
-                    Logger.Info(f"Super user registered as : {newUserName}")
+                    Logger.info(f"Super user registered as : {newUserName}")
                     print("\nSuper user successfully registered.")
 
                 else:
 
-                    Logger.Error(f"Failed to register super user.")
+                    Logger.error(f"Failed to register super user.")
                     print("\nFailed to register super user because of the one of the following reasons:\n" \
                           " - System password incorrect.\n" \
                           " - Another super user already exists.\n")
                     
             else:
 
-                Logger.Error("Failed to connect to the server.")
-                Logger.Error(f"Status code: {response.status_code}")
+                Logger.error("Failed to connect to the server.")
+                Logger.error(f"Status code: {response.status_code}")
                 print(f"\nFailed to connect to the server: {domain}\n"
                       f"Status code: {response.status_code}"
                       f"Please check the server domain and try it later.")

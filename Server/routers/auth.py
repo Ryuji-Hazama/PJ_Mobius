@@ -10,7 +10,7 @@ from fastapi import APIRouter
 import BaseModelData as BMD
 from datadomain import SessionUpdate, CheckSession, UserLogin
 
-Logger = maplex.Logger("AuthRouter")
+logger = maplex.Logger(__name__)
 
 router = APIRouter(prefix="/api/v1", tags=["authentication"])
 
@@ -18,12 +18,12 @@ router = APIRouter(prefix="/api/v1", tags=["authentication"])
 @router.get("/login", response_model=BMD.LoginRequestResponse)
 def getLogin(item: BMD.LoginRequestItem):
 
-    Logger.Info(f"Login request received: {item.UserName}")
+    logger.info(f"Login request received: {item.UserName}")
     retItem = BMD.LoginRequestResponse()
 
     if "" in {item.UserName, item.Password}:
 
-        Logger.Warn(f"UserName or Password, or both are blank: [UserName: {item.UserName}, Password: {item.Password}]")
+        logger.warn(f"UserName or Password, or both are blank: [UserName: {item.UserName}, Password: {item.Password}]")
         retItem.LoginResult.Message = "Empty item."
         return retItem
 
@@ -38,7 +38,7 @@ def getLogin(item: BMD.LoginRequestItem):
 
     except Exception as e:
 
-        Logger.ShowError(e, "Failed to login.")
+        logger.ShowError(e, "Failed to login.")
         retItem.ErrorInfo.Error = True
         retItem.ErrorInfo.Message = f"{e}"
 
@@ -57,7 +57,7 @@ def patchSession(item: BMD.UpdateSessionTimeRequestItem):
     # Update session time
     # Also used to log out (set update time to 00:00:00)
 
-    Logger.Info(f"Session update request received: {item.model_dump()}")
+    logger.info(f"Session update request received: {item.model_dump()}")
     retItem = BMD.UpdateSessionRequestResponse()
 
     try:
@@ -66,7 +66,7 @@ def patchSession(item: BMD.UpdateSessionTimeRequestItem):
 
     except Exception as e:
 
-        Logger.ShowError(e, "Failed to update session information.")
+        logger.ShowError(e, "Failed to update session information.")
         retItem.ErrorInfo.Error = True
         retItem.ErrorInfo.Message = f"{e}"
 
@@ -76,7 +76,7 @@ def patchSession(item: BMD.UpdateSessionTimeRequestItem):
 @router.get("/session", response_model=BMD.SessionInfoResponse)
 def getSessionInfo(item: BMD.UpdateSessionTimeRequestItem):
 
-    Logger.Info(f"Get session info request received: {item.model_dump()}")
+    logger.info(f"Get session info request received: {item.model_dump()}")
     retItem = BMD.SessionInfoResponse()
 
     try:
@@ -105,7 +105,7 @@ def getSessionInfo(item: BMD.UpdateSessionTimeRequestItem):
 
     except Exception as e:
 
-        Logger.ShowError(e, "Failed to get session information.")
+        logger.ShowError(e, "Failed to get session information.")
         retItem.ErrorInfo.Error = True
         retItem.ErrorInfo.Message = f"{e}"
 

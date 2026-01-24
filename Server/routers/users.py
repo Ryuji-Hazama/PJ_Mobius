@@ -10,7 +10,7 @@ from fastapi import APIRouter
 import BaseModelData as BMD
 from datadomain import UserInfo, UserPasswordUpdate
 
-Logger = maplex.Logger("UsersRouter")
+logger = maplex.Logger(__name__)
 
 router = APIRouter(prefix="/api/v1", tags=["users"])
 
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/api/v1", tags=["users"])
 @router.patch("/password", response_model=BMD.UpdatePasswordRequestResponse)
 def putPassword(item: BMD.UpdatePasswordRequestItem):
 
-    Logger.Info(f"Password update request received: {item.UserName}")
+    logger.info(f"Password update request received: {item.UserName}")
     retItem = BMD.UpdatePasswordRequestResponse()
 
     # If the old password is None, it is an higher-level user changing another user's password.
@@ -32,7 +32,7 @@ def putPassword(item: BMD.UpdatePasswordRequestItem):
 
     except Exception as e:
 
-        Logger.ShowError(e, "Failed to update password.")
+        logger.ShowError(e, "Failed to update password.")
         retItem.ErrorInfo.Error = True
         retItem.ErrorInfo.Message = f"{e}"
 
@@ -48,7 +48,7 @@ def putPassword(item: BMD.UpdatePasswordRequestItem):
 @router.post("/user", response_model=BMD.PostUserInfoResponse)
 def postUserInfo(item: BMD.PostUserInfoRequestItem):
 
-    Logger.Info(f"Post user info request received.")
+    logger.info(f"Post user info request received.")
     # No model dump for security reason
     retItem = BMD.PostUserInfoResponse()
 
@@ -70,7 +70,7 @@ def postUserInfo(item: BMD.PostUserInfoRequestItem):
 
     except Exception as e:
 
-        Logger.ShowError(e, "Failed to post user information.")
+        logger.ShowError(e, "Failed to post user information.")
         retItem.ErrorInfo.Error = True
         retItem.ErrorInfo.Message = f"{e}"
 
@@ -86,7 +86,7 @@ def postUserInfo(item: BMD.PostUserInfoRequestItem):
 @router.get("/user", response_model=BMD.GetUserInfoResponse)
 def getUserInfo(item: BMD.GetUserInfoRequestItem):
 
-    Logger.Info(f"Get user info request received: {item.model_dump()}")
+    logger.info(f"Get user info request received: {item.model_dump()}")
     retItem = BMD.GetUserInfoResponse()
 
     try:
@@ -106,7 +106,7 @@ def getUserInfo(item: BMD.GetUserInfoRequestItem):
 
     except Exception as e:
 
-        Logger.ShowError(e, "Failed to get user information.")
+        logger.ShowError(e, "Failed to get user information.")
         retItem.ErrorInfo.Error = True
         retItem.ErrorInfo.Message = f"{e}"
 

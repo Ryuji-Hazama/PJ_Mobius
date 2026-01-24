@@ -12,7 +12,7 @@ class AddUserForm(ttk.Frame):
 
         # Logging objects
 
-        self.Logger = maplex.Logger("AddUserForm")
+        self.logger = maplex.Logger(__name__)
 
         # Initialize frame
 
@@ -39,7 +39,7 @@ class AddUserForm(ttk.Frame):
 
         self.generateForm()
         self.generateButtons()
-        self.Logger.Info("Add User form initialized.")
+        self.logger.info("Add User form initialized.")
 
     def destroyChildren(self, master: ttk.Frame):
 
@@ -67,11 +67,11 @@ class AddUserForm(ttk.Frame):
                 self.company.set("")
                 self.combo_company.current(0)
 
-            self.Logger.Info("Add User form cleared.")
+            self.logger.info("Add User form cleared.")
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to clear Add User form.")
+            self.logger.ShowError(e, "Failed to clear Add User form.")
 
     def checkEntries(self) -> bool:
 
@@ -174,7 +174,7 @@ class AddUserForm(ttk.Frame):
         responseDict = UserInfo().postUserInfo(requestPayload)
         if responseDict is None:
 
-            self.Logger.Error("Failed to add new user.")
+            self.logger.error("Failed to add new user.")
             Dialog("Error", "Failed to add new user. Please check the logs for details.").showDialog()
             return
 
@@ -184,24 +184,24 @@ class AddUserForm(ttk.Frame):
 
                 errorMessage = responseDict.get("ErrorInfo").get("Message", "Unknown error.")
                 Dialog("Error", f"Failed to add new user.\n{errorMessage}").showDialog()
-                self.Logger.Error(f"Failed to add new user: {errorMessage}")
+                self.logger.error(f"Failed to add new user: {errorMessage}")
 
             else:
 
                 Dialog("Error", "Failed to add new user due to unknown error.").showDialog()
-                self.Logger.Error("Failed to add new user due to unknown error.")
+                self.logger.error("Failed to add new user due to unknown error.")
 
             return
         
         Dialog("Info", "New user added successfully.").showDialog()
-        self.Logger.Info(f"New user '{self.userName.get()}' added successfully.")
+        self.logger.info(f"New user '{self.userName.get()}' added successfully.")
         self.clearForm()
 
     def accessLevelChanged(self, event):
 
         # Handle access level change event
 
-        self.Logger.Debug(f"Access level changed to {self.accessLevel.get()}.")
+        self.logger.debug(f"Access level changed to {self.accessLevel.get()}.")
 
         if self.accessLevel.get() == "Super":
 
@@ -231,7 +231,7 @@ class AddUserForm(ttk.Frame):
                 # Guests cannot add new user
 
                 Dialog("Error", "You do not have permission to add new user.").showDialog()
-                self.Logger.Warn("Guest user attempted to add new user.")
+                self.logger.warn("Guest user attempted to add new user.")
                 self.destroy()
                 return
 
@@ -353,7 +353,7 @@ class AddUserForm(ttk.Frame):
 
         except Exception as e:
 
-            self.Logger.ShowError(e, "Failed to generate Add User form.")
+            self.logger.ShowError(e, "Failed to generate Add User form.")
             Dialog("Error", f"Failed to generate Add User form.\n{e}").showDialog()
             self.destroy()
             return
