@@ -1,0 +1,16 @@
+{
+    "MapleLogger": {
+        "ConsoleLogLevel": "DEBUG",
+        "FileLogLevel": "DEBUG",
+        "MaxLogSize": 3,
+        "WorkingDirectory": "logs",
+        "FileEncoding": "utf-8"
+    },
+    "Application": {
+        "HttpRequest": {
+            "Domain": "localhost:8085/api/v1",
+            "VerifySslPath": "certifications/jp-mobius-cert.crt",
+            "Timeout": 60
+        }
+    }
+}

@@ -1,0 +1,9 @@
+{
+    "MapleLogger": {
+        "ConsoleLogLevel": "DEBUG",
+        "FileLogLevel": "DEBUG",
+        "MaxLogSize": 3,
+        "WorkingDirectory": "/var/lib/pj-mobius-server/logs",
+        "FileEncoding": "utf-8"
+    }
+}

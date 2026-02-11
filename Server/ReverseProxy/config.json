@@ -1,0 +1,19 @@
+{
+    "MapleLogger": {
+        "ConsoleLogLevel": "DEBUG",
+        "FileLogLevel": "DEBUG",
+        "MaxLogSize": 3,
+        "WorkingDirectory": "logs",
+        "FileEncoding": "utf-8"
+    },
+    "ReverseProxyServer": {
+        "Upstream": "http://pj-mobius-server",
+        "ListenPort": 8085,
+        "Timeout": 60,
+        "MaxRequestPerMinute": 120,
+        "Burst": 20,
+        "SuspendTimeoutSeconds": 30,
+        "TrustXForwardedFor": false,
+        "MaxTokensCapacity": 10000
+    }
+}

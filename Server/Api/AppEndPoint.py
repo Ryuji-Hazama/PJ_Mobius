@@ -6,6 +6,7 @@ Main application entry point that initializes FastAPI and registers all routers.
 
 import maplex
 from fastapi import FastAPI
+import sys
 
 from routers import admin, auth, users, companies, health
 
@@ -38,6 +39,6 @@ try:
 except Exception as e:
 
     logger.ShowError(e, "Failed to initialize AppEndPoint.")
-    exit(1)
+    sys.exit(1)
 
 logger.info("AppEndPoint initialized successfully.")

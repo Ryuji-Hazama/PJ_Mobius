@@ -4,7 +4,9 @@ networks:
 
 services:
   pj-mobius-server:
-    build: .
+    build:
+      context: ./Api
+      dockerfile: Dockerfile
     image: pj-mobius-server:latest
     container_name: aurora
     restart: unless-stopped
@@ -14,8 +16,6 @@ services:
       DB_USER: /run/secrets/mysql_user
       DB_PASSWORD: /run/secrets/mysql_password
       HASH_ITERATIONS: 1023
-    ports:
-      - 8085:8085
     volumes:
       - /var/lib/pj-mobius-server/:/var/lib/pj-mobius-server
     depends_on:
@@ -27,6 +27,35 @@ services:
       - server_admin_password
       - mysql_user
       - mysql_password
+
+  pj-mobius-reverse-proxy:
+    container_name: Ava
+    build:
+      context: ./ReverseProxy
+      dockerfile: Dockerfile
+    image: pj-mobius-reverse-proxy:latest
+    ports:
+      - 8085:8085
+    volumes:
+      - /var/lib/pj-mobius-reverse-proxy:/var/lib/pj-mobius-reverse-proxy
+    secrets:
+      - certifi_crt
+      - certifi_key
+    depends_on:
+      - pj-mobius-server
+    networks:
+      - my-network
+    command: uvicorn
+      main:app
+      --host
+      0.0.0.0
+      --port
+      8085
+      --ssl-certfile
+      /run/secrets/certifi_crt
+      --ssl-keyfile
+      /run/secrets/certifi_key
+    restart: unless-stopped
 
   pj-mobius-db:
     image: mysql:9
@@ -50,12 +79,16 @@ services:
 
 secrets:
   server_admin_name:
-    file: ./secrets/server_admin_name.txt
+    file: ./Api/secrets/server_admin_name.txt
   server_admin_password:
-    file: ./secrets/server_admin_password.txt
+    file: ./Api/secrets/server_admin_password.txt
   root_password:
-    file: ./secrets/root_password.txt
+    file: ./Api/secrets/root_password.txt
   mysql_user:
-    file: ./secrets/mysql_user.txt
+    file: ./Api/secrets/mysql_user.txt
   mysql_password:
-    file: ./secrets/mysql_password.txt
+    file: ./Api/secrets/mysql_password.txt
+  certifi_crt:
+    file: ./ReverseProxy/certifications/pj-mobius-cert.crt
+  certifi_key:
+    file: ./ReverseProxy/certifications/pj-mobius-key.key

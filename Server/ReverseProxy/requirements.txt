@@ -1,0 +1,5 @@
+fastapi>=0.121.0
+httpx>=0.24.1
+uvicorn>=0.38.0
+more-itertools>=10.8.0
+MapleX==3.0.0a1
