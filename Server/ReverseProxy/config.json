@@ -6,14 +6,35 @@
         "WorkingDirectory": "logs",
         "FileEncoding": "utf-8"
     },
-    "ReverseProxyServer": {
-        "Upstream": "http://pj-mobius-server",
-        "ListenPort": 8085,
-        "Timeout": 60,
-        "MaxRequestPerMinute": 120,
-        "Burst": 20,
-        "SuspendTimeoutSeconds": 30,
+    "ReverseProxy": {
+        "Upstreams": {
+            "PrimaryDomain": "example.com",
+            "PrimaryUpstream": {
+                "Service": "pj-mobius-server",
+                "Port": 8085
+            },
+            "SubDomainMap": {
+                "user": {
+                    "Service": "sample-user-service",
+                    "Port": 8080
+                },
+                "admin": {
+                    "Service": "sample-admin-service",
+                    "Port": 8080
+                }
+            }
+        },
+        "RateLimit": {
+            "PerMinute": 90,
+            "Burst": 30,
+            "TimeoutSeconds": 30
+        },
+        "BlackList": {
+            "Enabled": true,
+            "IPs": []
+        },
+        "RequestTimeoutSeconds": 300,
         "TrustXForwardedFor": false,
-        "MaxTokensCapacity": 10000
+        "MaxTokenCapacity": 10000
     }
 }

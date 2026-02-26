@@ -1,0 +1,94 @@
+networks:
+  my-network:
+    driver: bridge
+
+services:
+  pj-mobius-server:
+    build:
+      context: ./Api
+      dockerfile: Dockerfile
+    image: pj-mobius-server:latest
+    container_name: aurora
+    restart: unless-stopped
+    environment:
+      ADMIN_NAME: /run/secrets/server_admin_name
+      ADMIN_PASSWORD: /run/secrets/server_admin_password #password
+      DB_USER: /run/secrets/mysql_user
+      DB_PASSWORD: /run/secrets/mysql_password
+      HASH_ITERATIONS: 1023
+    volumes:
+      - /var/lib/pj-mobius-server/:/var/lib/pj-mobius-server
+    depends_on:
+      - pj-mobius-db
+    networks:
+      - my-network
+    secrets:
+      - server_admin_name
+      - server_admin_password
+      - mysql_user
+      - mysql_password
+
+  pj-mobius-reverse-proxy:
+    container_name: Ava
+    build:
+      context: ./ReverseProxy
+      dockerfile: Dockerfile
+    image: pj-mobius-reverse-proxy:latest
+    ports:
+      - 8085:8085
+    volumes:
+      - /var/lib/pj-mobius-reverse-proxy:/var/lib/pj-mobius-reverse-proxy
+    secrets:
+      - certifi_crt
+      - certifi_key
+    depends_on:
+      - pj-mobius-server
+    networks:
+      - my-network
+    command: uvicorn
+      main:app
+      --host
+      0.0.0.0
+      --port
+      8085
+      --ssl-certfile
+      /run/secrets/certifi_crt
+      --ssl-keyfile
+      /run/secrets/certifi_key
+    restart: unless-stopped
+
+  pj-mobius-db:
+    image: mysql:9
+    container_name: janet
+    volumes:
+      - /var/lib/pj-mobius-server/mysql:/var/lib/mysql
+      - /var/lib/pj-mobius-server/init_db.sql:/docker-entrypoint-initdb.d/init.sql
+      - /var/lib/pj-mobius-server/initDBUserPermissions.sh:/docker-entrypoint-initdb.d/initDBUserPermissions.sh
+      - /var/lib/pj-mobius-server/demo_data.sql:/var/lib/mysql-files/demo_data.sql
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/root_password
+      MYSQL_USER_FILE: /run/secrets/mysql_user
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+      MYSQL_DATABASE: "MobiusDB"
+    networks:
+      - my-network
+    secrets:
+      - root_password
+      - mysql_user
+      - mysql_password
+
+secrets:
+  server_admin_name:
+    file: ./Api/secrets/server_admin_name.txt
+  server_admin_password:
+    file: ./Api/secrets/server_admin_password.txt
+  root_password:
+    file: ./Api/secrets/root_password.txt
+  mysql_user:
+    file: ./Api/secrets/mysql_user.txt
+  mysql_password:
+    file: ./Api/secrets/mysql_password.txt
+  certifi_crt:
+    file: ./ReverseProxy/certifications/pj-mobius-cert.crt
+  certifi_key:
+    file: ./ReverseProxy/certifications/pj-mobius-key.key

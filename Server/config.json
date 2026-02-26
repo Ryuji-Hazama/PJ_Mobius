@@ -1,0 +1,34 @@
+{
+    "MapleLogger": {
+        "ConsoleLogLevel": "DEBUG",
+        "FileLogLevel": "INFO",
+        "MaxLogSize": 3,
+        "WorkingDirectory": "logs",
+        "FileEncoding": "utf-8"
+    },
+    "ApplicationSettings": {
+        "Images": [
+            {
+                "Name": "PJ_Mobius Reverse Proxy",
+                "BaseImage": "pj-mobius-reverse-proxy",
+                "Dockerfile": "Dockerfile",
+                "ContextPath": "./ReverseProxy",
+                "Version": "1.0.0"
+            },
+            {
+                "Name": "PJ_Mobius",
+                "BaseImage": "pj-mobius-server",
+                "Dockerfile": "Dockerfile",
+                "ContextPath": "./Api",
+                "Version": "1.0.0"
+            }
+        ],
+        "BuildSettings": {
+            "DeleteExistingImages": true,
+            "AutoVersioning": true,
+            "VersionFormat": "major.minor.patch",
+            "ComposeFilePath": "./compose.yaml",
+            "ComposeCommand": "docker compose"
+        }
+    }
+}
