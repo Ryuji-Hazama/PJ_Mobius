@@ -3,7 +3,7 @@
         "ConsoleLogLevel": "DEBUG",
         "FileLogLevel": "DEBUG",
         "MaxLogSize": 3,
-        "WorkingDirectory": "/var/lib/pj-mobius-server/logs",
+        "WorkingDirectory": "/app/logs",
         "FileEncoding": "utf-8"
     }
 }

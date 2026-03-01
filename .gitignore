@@ -1,4 +1,5 @@
-Server/DB_init/demo_*
+Server/Database/init/demo_*
+Server/Database/mysql
 
 Client/InitialSuperSignUp/*.crt
 Client/InitialSuperSignUp/*.key

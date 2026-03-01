@@ -8,20 +8,10 @@
     },
     "ReverseProxy": {
         "Upstreams": {
-            "PrimaryDomain": "example.com",
+            "PrimaryDomain": "localhost",
             "PrimaryUpstream": {
                 "Service": "pj-mobius-server",
                 "Port": 8085
-            },
-            "SubDomainMap": {
-                "user": {
-                    "Service": "sample-user-service",
-                    "Port": 8080
-                },
-                "admin": {
-                    "Service": "sample-admin-service",
-                    "Port": 8080
-                }
             }
         },
         "RateLimit": {
@@ -35,6 +25,7 @@
         },
         "RequestTimeoutSeconds": 300,
         "TrustXForwardedFor": false,
-        "MaxTokenCapacity": 10000
+        "MaxTokenCapacity": 10000,
+        "HTTPSRedirect": true
     }
 }

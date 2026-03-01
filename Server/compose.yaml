@@ -17,7 +17,7 @@ services:
       DB_PASSWORD: /run/secrets/mysql_password
       HASH_ITERATIONS: 1023
     volumes:
-      - /var/lib/pj-mobius-server/:/var/lib/pj-mobius-server
+      - ./Api/:/app/
     depends_on:
       - pj-mobius-db
     networks:
@@ -37,7 +37,7 @@ services:
     ports:
       - 8085:8085
     volumes:
-      - /var/lib/pj-mobius-reverse-proxy:/var/lib/pj-mobius-reverse-proxy
+      - ./ReverseProxy/:/app/
     secrets:
       - certifi_crt
       - certifi_key
@@ -61,10 +61,10 @@ services:
     image: mysql:9
     container_name: janet
     volumes:
-      - /var/lib/pj-mobius-server/mysql:/var/lib/mysql
-      - /var/lib/pj-mobius-server/init_db.sql:/docker-entrypoint-initdb.d/init.sql
-      - /var/lib/pj-mobius-server/initDBUserPermissions.sh:/docker-entrypoint-initdb.d/initDBUserPermissions.sh
-      - /var/lib/pj-mobius-server/demo_data.sql:/var/lib/mysql-files/demo_data.sql
+      - ./Database/mysql:/var/lib/mysql
+      - ./Database/init/init_db.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./Database/init/initDBUserPermissions.sh:/docker-entrypoint-initdb.d/initDBUserPermissions.sh
+      - ./Database/init/demo_data.sql:/var/lib/mysql-files/demo_data.sql
     environment:
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/root_password
       MYSQL_USER_FILE: /run/secrets/mysql_user

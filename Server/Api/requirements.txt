@@ -1,6 +1,6 @@
 cryptography>=46.0.3
 fastapi>=0.121.0
-maplex==3.0.0a1
+maplex>=3.0.0
 pydantic>=2.11.9
 PyMySQL>=1.1.2
 uvicorn>=0.38.0

@@ -1,4 +1,5 @@
 import asyncio
+import os
 import time
 from typing import Dict, Tuple
 
@@ -12,20 +13,47 @@ from fastapi.responses import HTMLResponse
 logger = maplex.getLogger("reverse-proxy")
 configFile = maplex.MapleJson("config.json").read("ReverseProxy")
 
+# Greeting
+
+print(r"""
+Welcome to...
+   ____       _                   ____  ____  
+  / ___|  ___| | ___ _ __   ___  |  _ \|  _ \ 
+  \___ \ / _ \ |/ _ \ '_ \ / _ \ | |_) | |_) |
+   ___) |  __/ |  __/ | | |  __/ |  _ <|  __/ 
+  |____/ \___|_|\___|_| |_|\___| |_| \_\_|    
+
+            """)
+
 if configFile is None:
     logger.warn("config.json not found or ReverseProxy section missing, using default settings")
     configFile = {}
 
+#
 # Static configuration values
+#
+
+# Upstream configurations
+
+UPSTREAMS = configFile.get("Upstreams", {})
+PRIMARY_UPSTREAM = UPSTREAMS.get("PrimaryUpstream", None)
+PRIMARY_DOMAIN = UPSTREAMS.get("PrimaryDomain", "")
+SUBDOMAIN_MAP = UPSTREAMS.get("SubDomainMap", {})
+
+# Limit configurations
 
 RATE_LIMIT_PER_MIN = int(configFile.get("RateLimit", {}).get("PerMinute", 120))
 RATE_LIMIT_BURST = int(configFile.get("RateLimit", {}).get("Burst", 60))
 RATE_LIMIT_TIMEOUT_SECONDS = int(configFile.get("RateLimit", {}).get("TimeoutSeconds", 30))
+
+# Other configurations
+
 REQUEST_TIMEOUT_SECONDS = int(configFile.get("RequestTimeoutSeconds", 30))
 TRUST_X_FORWARDED_FOR = configFile.get("TrustXForwardedFor", False)
 MAX_TOKEN_CAPACITY = int(configFile.get("MaxTokenCapacity", 10000))
 BLACKLIST_ENABLED = configFile.get("BlackList", {}).get("Enabled", False)
 BLACKLIST_IPS = set(configFile.get("BlackList", {}).get("IPs", []))
+HTTPS_REDIRECT_ONLY = os.getenv("HTTPS_REDIRECT_ONLY", "false").strip().lower() in {"1", "true", "yes", "on"}
 
 HOP_BY_HOP_HEADERS = {
     "connection",
@@ -196,6 +224,19 @@ async def proxy(request: Request, path: str) -> Response:
     start = time.monotonic()
     client_ip = get_client_ip(request)
 
+    if HTTPS_REDIRECT_ONLY:
+
+        host = request.headers.get("host", "")
+
+        if not host:
+
+            host = PRIMARY_DOMAIN
+
+        host = host.split(":", 1)[0].lower()
+        query_string = f"?{request.url.query}" if request.url.query else ""
+        redirect_url = f"https://{host}/{path}{query_string}"
+        return Response(status_code=308, headers={"location": redirect_url})
+
     if not await bucket.allow(client_ip):
 
         # Rate limit exceeded
@@ -218,22 +259,20 @@ async def proxy(request: Request, path: str) -> Response:
 
     # Determine upstream URL
 
-    domain = request.headers.get("host", "")
-    subdomain = domain.split(".")[0]
-    upstreams = configFile.get("Upstreams", {})
-    primary_upstream = upstreams.get("PrimaryUpstream", None)
-    primary_domain = upstreams.get("PrimaryDomain", "")
-    subdomain_map = upstreams.get("SubDomainMap", {})
+    raw_host = request.headers.get("host", "")
+    domain = raw_host.split(":", 1)[0].lower()
+    subdomain = domain.split(".")[0] if domain else ""
+    logger.debug(f"Request recieved for host={raw_host}")
 
     # Determine which upstream to use based on the host header and subdomain mapping
 
-    if domain == primary_domain:
+    if domain == PRIMARY_DOMAIN:
 
-        upstream_info = primary_upstream
+        upstream_info = PRIMARY_UPSTREAM
 
     else:
 
-        upstream_info = subdomain_map.get(subdomain, None)
+        upstream_info = SUBDOMAIN_MAP.get(subdomain, None)
 
     if upstream_info is None:
 
@@ -256,12 +295,23 @@ async def proxy(request: Request, path: str) -> Response:
     service = upstream_info.get("Service", "atc_listsite")
     port = upstream_info.get("Port", 8080)
     upstream_url = f"http://{service}:{port}"
+    logger.debug(f"Forward request to: {upstream_url}")
 
     # Forward request to upstream server
 
     upstream_url = f"{upstream_url}/{path}"
     headers = {k: v for k, v in request.headers.items() if k.lower() not in HOP_BY_HOP_HEADERS}
+
+    forwarded_port = request.url.port
+
+    if forwarded_port is None:
+
+        forwarded_port = 443 if request.url.scheme == "https" else 80
+
     headers["x-forwarded-for"] = client_ip
+    headers["x-forwarded-proto"] = request.url.scheme
+    headers["x-forwarded-host"] = domain
+    headers["x-forwarded-port"] = str(forwarded_port)
     body = await request.body()
 
     try:
